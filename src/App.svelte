@@ -84,13 +84,13 @@
 </div>
 <div>
   size:
-  <input type="number" bind:value={bulletSize} />
+  <input type="number" bind:value={bulletSize} min="3" max="20"/>
 </div>
 <div>
   angle:
-  <input type="number" bind:value={bulletAngleDegrees} />
+  <input type="number" bind:value={bulletAngleDegrees} min="90" max="360"/>
 </div>
 <div>
   velocity:
-  <input type="number" bind:value={bulletVelocity} />
+  <input type="number" bind:value={bulletVelocity} min="1" max="10"/>
 </div>
