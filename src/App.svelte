@@ -2,6 +2,7 @@
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
+  import { factory } from './factory.js';
   import { 
     engine,
     runner,
@@ -15,58 +16,20 @@
 
   onMount(() => {
     setupMatter();
-    let planet = createPlanet(680, 480, 60);
-    player.set(createPlayer(250, 250, 20));
-    let cpu = createCpu(650, 650, 20);
+    let planet = factory.createPlanet(680, 480, 60);
+    player.set(factory.createPlayer(250, 250, 20));
+    let cpu = factory.createCpu(650, 650, 20);
     listenForHitOnCpu($engine, cpu);
     populateWorld([ planet, $player, cpu ]);
   });
 
   const setupMatter = () => {
-    render.set(Matter.Render.create({
-      element: document.getElementById("canvas"),
-      engine: $engine,
-      options: {
-        width: Math.min(document.documentElement.clientWidth, 1024),
-        height: Math.min(document.documentElement.clientHeight, 720),
-        wireframes: false
-      }
-    }));
-
+    render.set(factory.createRender(document, "canvas", $engine));
     Matter.Runner.run($runner, $engine);
     Matter.Render.run($render);
-
-    setGravityZero($engine.world);
+    $engine.world.gravity.scale = 0;
     world.set($engine.world);
   }
-
-  const setGravityZero = (worldInternal) =>
-    worldInternal.gravity.scale = 0;
-
-  const createPlanet = (x, y, radius) => {
-    let newPlanet = createCircle(x, y, radius, true, true);
-    Matter.Body.setDensity(newPlanet, 0.4);
-    return newPlanet;
-  }
-
-  const createCircle = (x, y, radius, isStatic, hasGravity) =>  
-    Matter.Bodies.circle(
-      x, 
-      y, 
-      radius, 
-      { 
-        isStatic, 
-        plugin: hasGravity ? { attractors: [ MatterAttractors.Attractors.gravity ] } : null 
-      });
-  
-  const createPlayer = (x, y, length) =>
-    createStaticRectangle(x, y, length, true);
-
-  const createCpu = (x, y, length) =>
-    createStaticRectangle(x, y, length, false);
-
-  const createStaticRectangle = (x, y, length, isSensor) =>
-    Matter.Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
 
   const listenForHitOnCpu = (engineInternal, cpu) =>
     Matter.Events.on(engineInternal, "collisionStart", (event) => {
@@ -80,16 +43,8 @@
     Matter.World.add($world, objectsToAdd);
 
   const fire = () => {
-    let bullet = Matter.Bodies.circle(
-      $player.position.x,
-      $player.position.y,
-      $bulletSettings.size,
-      { density: 0.1 }
-    );
-
-    let force = Matter.Vector.mult(
-      Matter.Vector.create(Math.cos($radians), Math.sin($radians)), 
-      $bulletSettings.velocity);
+    let bullet = factory.createBullet($player, $bulletSettings.size);
+    let force = factory.createBulletForce($radians, $bulletSettings.velocity);
 
     populateWorld(bullet);
     Matter.Body.applyForce(
