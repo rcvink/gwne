@@ -2,28 +2,35 @@
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
-  Matter.use(MatterAttractors);
-
-  let Engine = Matter.Engine,
-    Runner = Matter.Runner,
-    Render = Matter.Render,
-    World = Matter.World,
-    Common = Matter.Common,
-    Bodies = Matter.Bodies,
-    Vector = Matter.Vector,
-    Body = Matter.Body,
-    Events = Matter.Events;
+  
   let world;
   let player;
-  let bulletSize = 10;
-  let bulletAngleDegrees = 45;
-  let bulletVelocity = 1;
-  $: bulletAngleRadians = (bulletAngleDegrees * Math.PI) / 180;
-  let result = "in progress";
+  let bulletSettings = {
+    size: 10,
+    angleDegrees: 45,
+    velocity: 1
+  };
+  let hasWon = false;
+
+  Matter.use(MatterAttractors);
 
   onMount(() => {
-    let engine = Engine.create();
-    let render = Render.create({
+    let { engine, render, runner } = createEngineRenderRunner();
+    run({ engine, render, runner });
+
+    world = engine.world;
+    setGravityZero(world);
+
+    let planet = createPlanet(680, 480, 60);
+    player = createPlayer(250, 250, 20);
+    let cpu = createCpu(650, 650, 20);
+    listenForHitOnCpu({ engine, cpu });
+    populateWorld([ planet, player, cpu ]);
+  });
+
+  const createEngineRenderRunner = () => {
+    let engine = Matter.Engine.create();
+    let render = Matter.Render.create({
       element: document.getElementById("canvas"),
       engine: engine,
       options: {
@@ -32,40 +39,35 @@
         wireframes: false
       }
     });
+    let runner = Matter.Runner.create();
 
-    let runner = Runner.create();
-    Runner.run(runner, engine);
-    Render.run(render);
+    return { engine, render, runner };
+  }
 
-    world = engine.world;
+  const run = ({ engine, render, runner }) => {
+    Matter.Runner.run(runner, engine);
+    Matter.Render.run(render);
+  }
+
+  const setGravityZero = () =>
     world.gravity.scale = 0;
 
-    let planet = createPlanet(
-      (2 * render.options.width) / 3,
-      (2 * render.options.height) / 3,
-      60
-    );
-    Body.setDensity(planet, 0.4);
+  const createPlanet = (x, y, radius) => {
+    let newPlanet = createCircle(x, y, radius, true, true);
+    Matter.Body.setDensity(newPlanet, 0.4);
+    return newPlanet;
+  }
 
-    player = createPlayer(250, 250, 20);
-    let cpu = createCpu(650, 650, 20);
-
-    Events.on(engine, "collisionStart", (event) => {
-      let pairs = event.pairs[0];
-      if (pairs.bodyA.id == cpu.id || pairs.bodyB.id == cpu.id) {
-        result = "won!";
-      }
-    });
-
-    World.add(world, [planet, player, cpu]);
-  });
-
-  const createPlanet = (x, y, radius) =>
-    Bodies.circle(x, y, radius, {
-      isStatic: true,
-      plugin: { attractors: [ MatterAttractors.Attractors.gravity ] }
-    });
-
+  const createCircle = (x, y, radius, isStatic, hasGravity) =>  
+    Matter.Bodies.circle(
+      x, 
+      y, 
+      radius, 
+      { 
+        isStatic, 
+        plugin: hasGravity ? { attractors: [ MatterAttractors.Attractors.gravity ] } : null 
+      });
+  
   const createPlayer = (x, y, length) =>
     createStaticRectangle(x, y, length, true);
 
@@ -73,22 +75,35 @@
     createStaticRectangle(x, y, length, false);
 
   const createStaticRectangle = (x, y, length, isSensor) =>
-    Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
+    Matter.Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
+
+  const listenForHitOnCpu = ({ engine, cpu }) =>
+    Matter.Events.on(engine, "collisionStart", (event) => {
+      let pairs = event.pairs[0];
+      if (pairs.bodyA.id == cpu.id || pairs.bodyB.id == cpu.id) {
+        hasWon = true;
+      }
+    });
+
+  const populateWorld = (objectsToAdd) => 
+    Matter.World.add(world, objectsToAdd);
 
   const fire = () => {
-    let bullet = Bodies.circle(
+    let bullet = Matter.Bodies.circle(
       player.position.x,
       player.position.y,
-      bulletSize,
+      bulletSettings.size,
       { density: 0.1 }
     );
 
-    let force = Vector.mult(
-      Vector.create(Math.cos(bulletAngleRadians), Math.sin(bulletAngleRadians)), 
-      bulletVelocity);
+    let radians = (bulletSettings.angleDegrees * Math.PI) / 180;
 
-    World.add(world, bullet);
-    Body.applyForce(
+    let force = Matter.Vector.mult(
+      Matter.Vector.create(Math.cos(radians), Math.sin(radians)), 
+      bulletSettings.velocity);
+
+    Matter.World.add(world, bullet);
+    Matter.Body.applyForce(
       bullet,
       bullet.position,
       force);
@@ -100,17 +115,21 @@
 </div>
 <div>
   size:
-  <input type="number" bind:value={bulletSize} min="3" max="20"/>
+  <input type="number" bind:value={bulletSettings.size} min="3" max="20"/>
 </div>
 <div>
   angle:
-  <input type="number" bind:value={bulletAngleDegrees} min="90" max="360"/>
+  <input type="number" bind:value={bulletSettings.angleDegrees} min="90" max="360"/>
 </div>
 <div>
   velocity:
-  <input type="number" bind:value={bulletVelocity} min="1" max="10"/>
+  <input type="number" bind:value={bulletSettings.velocity} min="1" max="10"/>
 </div>
 
-{result}
+{#if hasWon}
+  Won!
+{:else}
+  Keep trying.
+{/if}
 
 <div id="canvas"/>
