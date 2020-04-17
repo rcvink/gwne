@@ -45,10 +45,7 @@
     );
     Body.setDensity(planet, 0.4);
 
-    console.log('d', planet.density);
-    console.log('m', planet.mass);
-
-    player = createPlayer(250, 250, 1);
+    player = createPlayer(250, 250, 100);
 
     World.add(world, [planet, player]);
   });
@@ -60,7 +57,7 @@
     });
 
   const createPlayer = (x, y, length) =>
-    Bodies.rectangle(x, y, length, length, { isStatic: true });
+    Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor: true });
 
   const fire = () => {
     let bullet = Bodies.circle(
