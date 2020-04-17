@@ -16,7 +16,7 @@
   let player;
   let bulletSize = 10;
   let bulletAngleDegrees = 45;
-  let bulletVelocity = 10;
+  let bulletVelocity = 1;
   $: bulletAngleRadians = (bulletAngleDegrees * Math.PI) / 180;
 
   onMount(() => {
@@ -67,11 +67,15 @@
       { density: 0.1 }
     );
 
+    let force = Vector.mult(
+      Vector.create(Math.cos(bulletAngleRadians), Math.sin(bulletAngleRadians)), 
+      bulletVelocity);
+
     World.add(world, bullet);
     Body.applyForce(
       bullet,
       bullet.position,
-      Vector.create(Math.cos(bulletAngleRadians), Math.sin(bulletAngleRadians)));
+      force);
   };
 </script>
 
