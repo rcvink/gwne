@@ -11,18 +11,20 @@
     Common = Matter.Common,
     Bodies = Matter.Bodies,
     Vector = Matter.Vector,
-    Body = Matter.Body;
+    Body = Matter.Body,
+    Events = Matter.Events;
   let world;
   let player;
   let bulletSize = 10;
   let bulletAngleDegrees = 45;
   let bulletVelocity = 1;
   $: bulletAngleRadians = (bulletAngleDegrees * Math.PI) / 180;
+  let result = "in progress";
 
   onMount(() => {
     let engine = Engine.create();
     let render = Render.create({
-      element: document.body,
+      element: document.getElementById("canvas"),
       engine: engine,
       options: {
         width: Math.min(document.documentElement.clientWidth, 1024),
@@ -45,9 +47,17 @@
     );
     Body.setDensity(planet, 0.4);
 
-    player = createPlayer(250, 250, 100);
+    player = createPlayer(250, 250, 20);
+    let cpu = createCpu(650, 650, 20);
 
-    World.add(world, [planet, player]);
+    Events.on(engine, "collisionStart", (event) => {
+      let pairs = event.pairs[0];
+      if (pairs.bodyA.id == cpu.id || pairs.bodyB.id == cpu.id) {
+        result = "won!";
+      }
+    });
+
+    World.add(world, [planet, player, cpu]);
   });
 
   const createPlanet = (x, y, radius) =>
@@ -57,7 +67,13 @@
     });
 
   const createPlayer = (x, y, length) =>
-    Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor: true });
+    createStaticRectangle(x, y, length, true);
+
+  const createCpu = (x, y, length) =>
+    createStaticRectangle(x, y, length, false);
+
+  const createStaticRectangle = (x, y, length, isSensor) =>
+    Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
 
   const fire = () => {
     let bullet = Bodies.circle(
@@ -94,3 +110,7 @@
   velocity:
   <input type="number" bind:value={bulletVelocity} min="1" max="10"/>
 </div>
+
+{result}
+
+<div id="canvas"/>
