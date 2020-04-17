@@ -3,48 +3,41 @@
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
   import { 
+    engine,
+    runner,
+    render,
     world, 
     player, 
     bulletSettings, 
     hasWon, 
-    radians 
+    radians
     } from './stores.js';
-  
-  Matter.use(MatterAttractors);
 
   onMount(() => {
-    let { engine, render, runner } = createEngineRenderRunner();
-    run({ engine, render, runner });
-
-    setGravityZero(engine.world);
-    world.set(engine.world);
-
+    setupMatter();
     let planet = createPlanet(680, 480, 60);
     player.set(createPlayer(250, 250, 20));
     let cpu = createCpu(650, 650, 20);
-    listenForHitOnCpu({ engine, cpu });
+    listenForHitOnCpu($engine, cpu);
     populateWorld([ planet, $player, cpu ]);
   });
 
-  const createEngineRenderRunner = () => {
-    let engine = Matter.Engine.create();
-    let render = Matter.Render.create({
+  const setupMatter = () => {
+    render.set(Matter.Render.create({
       element: document.getElementById("canvas"),
-      engine: engine,
+      engine: $engine,
       options: {
         width: Math.min(document.documentElement.clientWidth, 1024),
         height: Math.min(document.documentElement.clientHeight, 720),
         wireframes: false
       }
-    });
-    let runner = Matter.Runner.create();
+    }));
 
-    return { engine, render, runner };
-  }
+    Matter.Runner.run($runner, $engine);
+    Matter.Render.run($render);
 
-  const run = ({ engine, render, runner }) => {
-    Matter.Runner.run(runner, engine);
-    Matter.Render.run(render);
+    setGravityZero($engine.world);
+    world.set($engine.world);
   }
 
   const setGravityZero = (worldInternal) =>
@@ -75,8 +68,8 @@
   const createStaticRectangle = (x, y, length, isSensor) =>
     Matter.Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
 
-  const listenForHitOnCpu = ({ engine, cpu }) =>
-    Matter.Events.on(engine, "collisionStart", (event) => {
+  const listenForHitOnCpu = (engineInternal, cpu) =>
+    Matter.Events.on(engineInternal, "collisionStart", (event) => {
       let pairs = event.pairs[0];
       if (pairs.bodyA.id == cpu.id || pairs.bodyB.id == cpu.id) {
         hasWon.set(true);
