@@ -17,12 +17,13 @@
     cpu,
     cpuRadians,
     cpuBulletVelocity,
-    collisionGroups
+    collisionGroups,
+    densities
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 60, $collisionGroups.planet);
+    let planet = factory.createPlanet(680, 480, 60, $collisionGroups.planet, $densities.planet);
     player.set(factory.createPlayer(250, 250, 20, $collisionGroups.player));
     cpu.set(factory.createCpu(530, 20, 20, $collisionGroups.cpu));
     cpuFireOnPlayerFire(
@@ -30,7 +31,8 @@
       $cpu, 
       $cpuRadians, 
       $cpuBulletVelocity,
-      $collisionGroups.bullets.cpu);
+      $collisionGroups.bullets.cpu,
+      $densities.bullet);
     setFlagTrueOnHit($engine, $cpu.id, hasHitCpu);
     setFlagTrueOnHit($engine, $player.id, hasHitPlayer);
     populateWorld([ planet, $player, $cpu ]);
@@ -41,7 +43,8 @@
       $player, 
       $playerRadians, 
       $bulletSettings.velocity, 
-      $collisionGroups.bullets.player);
+      $collisionGroups.bullets.player,
+      $densities.bullet);
     fireCount.update(n => n + 1);
   }
 
@@ -53,10 +56,10 @@
     world.set($engine.world);
   }
 
-  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionGroup) =>
+  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionGroup, density) =>
     fireCountInternal.subscribe((newValue) => {
       if (newValue > 0) {
-        fire(cpuInternal, rads, velocity, collisionGroup);
+        fire(cpuInternal, rads, velocity, collisionGroup, density);
       }
     }); 
 
@@ -66,8 +69,12 @@
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
-  const fire = (fromBody, rads, velocity, collisionGroup) => {
-    let bullet = factory.createBullet(fromBody, $bulletSettings.size, collisionGroup);
+  const fire = (fromBody, rads, velocity, collisionGroup, density) => {
+    let bullet = factory.createBullet(
+      fromBody, 
+      $bulletSettings.size, 
+      collisionGroup, 
+      density);
 
     populateWorld(bullet);
     Matter.Body.applyForce(

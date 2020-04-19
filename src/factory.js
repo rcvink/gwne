@@ -1,17 +1,14 @@
 import Matter from "matter-js";
 import MatterAttractors from "matter-attractors";
 
-const planetDensity = 0.4;
-const bulletDensity = 0.1;
-
-const createPlanet = (x, y, radius, group) => {
+const createPlanet = (x, y, radius, group, density) => {
     let options = {
         isStatic: true,
         collisionFilter: { group },
         plugin: { attractors: [ MatterAttractors.Attractors.gravity ]}
     };
     let planet = Matter.Bodies.circle(x, y, radius, options);
-    Matter.Body.setDensity(planet, planetDensity);
+    Matter.Body.setDensity(planet, density);
     return planet;
 }
 
@@ -32,12 +29,12 @@ const createRender = (document, canvasId, engine) =>
         }
     });
 
-const createBullet = (fromBody, size, group) =>
+const createBullet = (fromBody, size, group, density) =>
     Matter.Bodies.circle(
         fromBody.position.x,
         fromBody.position.y,
         size,
-        { density: bulletDensity, collisionFilter: { group } }
+        { density, collisionFilter: { group } }
     );
 
 const createBulletForce = (radians, velocity) =>

@@ -8,6 +8,10 @@ const position = {
     y: 0
 };
 
+export const densities = readable({
+    planet: 0.4,
+    bullet: 0.1
+});
 export const collisionGroups = readable({
     player: -1,
     cpu: -2,
