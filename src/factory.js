@@ -11,10 +11,10 @@ const createPlanet = (x, y, radius) => {
 }
 
 const createCpu = (x, y, length) =>
-    createStaticRectangle(x, y, length, false);
+    createStaticRectangle(x, y, length);
 
 const createPlayer = (x, y, length) =>
-    createStaticRectangle(x, y, length, true);
+    createStaticRectangle(x, y, length);
 
 const createRender = (document, canvasId, engine) =>
     Matter.Render.create({
@@ -27,10 +27,10 @@ const createRender = (document, canvasId, engine) =>
         }
     });
 
-const createBullet = (player, size) =>
+const createBullet = (fromBody, size) =>
     Matter.Bodies.circle(
-        player.position.x,
-        player.position.y,
+        fromBody.position.x,
+        fromBody.position.y,
         size,
         { density: bulletDensity }
     );
@@ -49,8 +49,8 @@ const createCircle = (x, y, radius, isStatic, hasGravity) => {
     return Matter.Bodies.circle(x, y, radius, options);
 }
 
-const createStaticRectangle = (x, y, length, isSensor) =>
-    Matter.Bodies.rectangle(x, y, length, length, { isStatic: true, isSensor });
+const createStaticRectangle = (x, y, length) =>
+    Matter.Bodies.rectangle(x, y, length, length, { isStatic: true });
 
 const createVector = (radians) =>
     Matter.Vector.create(Math.cos(radians), Math.sin(radians));
