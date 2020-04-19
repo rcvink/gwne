@@ -35,7 +35,7 @@
   });
 
   const onClick = () => {
-    fire($player, $playerRadians, $bulletSettings.velocity);
+    fire($player, $playerRadians, $bulletSettings.velocity, factory.collisionGroups.playerBullet);
     fireCount.update(n => n + 1);
   }
 
@@ -48,7 +48,7 @@
   }
 
   const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity) =>
-    fireCountInternal.subscribe(() => fire(cpuInternal, rads, velocity));
+    fireCountInternal.subscribe(() => fire(cpuInternal, rads, velocity, factory.collisionGroups.cpuBullet));
 
   const setFlagTrueOnHit= (engineInternal, bodyId, flag) =>
     onHitBody(engineInternal, bodyId, () => flag.set(true));
@@ -56,8 +56,8 @@
   const populateWorld = (objectsToAdd) => 
     Matter.World.add($world, objectsToAdd);
 
-  const fire = (fromBody, rads, velocity) => {
-    let bullet = factory.createBullet(fromBody, $bulletSettings.size);
+  const fire = (fromBody, rads, velocity, collisionGroup) => {
+    let bullet = factory.createBullet(fromBody, $bulletSettings.size, collisionGroup);
     let force = factory.createBulletForce(rads, velocity);
 
     populateWorld(bullet);
