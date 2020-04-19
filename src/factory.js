@@ -3,18 +3,11 @@ import MatterAttractors from "matter-attractors";
 
 const planetDensity = 0.4;
 const bulletDensity = 0.1;
-const collisionGroups = {
-    player: -1,
-    playerBullet: -1,
-    cpu: -2,
-    cpuBullet: -2,
-    planet: -3,
-};
 
-const createPlanet = (x, y, radius) => {
+const createPlanet = (x, y, radius, group) => {
     let options = {
         isStatic: true,
-        collisionFilter: { group: collisionGroups.planet },
+        collisionFilter: { group },
         plugin: { attractors: [ MatterAttractors.Attractors.gravity ]}
     };
     let planet = Matter.Bodies.circle(x, y, radius, options);
@@ -22,11 +15,11 @@ const createPlanet = (x, y, radius) => {
     return planet;
 }
 
-const createCpu = (x, y, length) =>
-    createStaticRectangle(x, y, length, collisionGroups.cpu);
+const createCpu = (x, y, length, collisionGroup) =>
+    createStaticRectangle(x, y, length, collisionGroup);
 
-const createPlayer = (x, y, length) =>
-    createStaticRectangle(x, y, length, collisionGroups.player);
+const createPlayer = (x, y, length, collisionGroup) =>
+    createStaticRectangle(x, y, length, collisionGroup);
 
 const createRender = (document, canvasId, engine) =>
     Matter.Render.create({
@@ -61,7 +54,6 @@ const createVector = (radians) =>
     Matter.Vector.create(Math.cos(radians), Math.sin(radians));
 
 export const factory = {
-    collisionGroups,
     createPlanet,
     createCpu,
     createPlayer,

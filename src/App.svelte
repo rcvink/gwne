@@ -16,26 +16,32 @@
     fireCount,
     cpu,
     cpuRadians,
-    cpuBulletVelocity
+    cpuBulletVelocity,
+    collisionGroups
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 60);
-    player.set(factory.createPlayer(250, 250, 20));
-    cpu.set(factory.createCpu(530, 20, 20));
+    let planet = factory.createPlanet(680, 480, 60, $collisionGroups.planet);
+    player.set(factory.createPlayer(250, 250, 20, $collisionGroups.player));
+    cpu.set(factory.createCpu(530, 20, 20, $collisionGroups.cpu));
     cpuFireOnPlayerFire(
       fireCount, 
       $cpu, 
       $cpuRadians, 
-      $cpuBulletVelocity);
+      $cpuBulletVelocity,
+      $collisionGroups.bullets.cpu);
     setFlagTrueOnHit($engine, $cpu.id, hasHitCpu);
     setFlagTrueOnHit($engine, $player.id, hasHitPlayer);
     populateWorld([ planet, $player, $cpu ]);
   });
 
   const onClick = () => {
-    fire($player, $playerRadians, $bulletSettings.velocity, factory.collisionGroups.playerBullet);
+    fire(
+      $player, 
+      $playerRadians, 
+      $bulletSettings.velocity, 
+      $collisionGroups.bullets.player);
     fireCount.update(n => n + 1);
   }
 
@@ -47,24 +53,27 @@
     world.set($engine.world);
   }
 
-  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity) =>
-    fireCountInternal.subscribe(() => fire(cpuInternal, rads, velocity, factory.collisionGroups.cpuBullet));
+  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionGroup) =>
+    fireCountInternal.subscribe((newValue) => {
+      if (newValue > 0) {
+        fire(cpuInternal, rads, velocity, collisionGroup);
+      }
+    }); 
 
   const setFlagTrueOnHit= (engineInternal, bodyId, flag) =>
     onHitBody(engineInternal, bodyId, () => flag.set(true));
 
-  const populateWorld = (objectsToAdd) => 
+  const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
   const fire = (fromBody, rads, velocity, collisionGroup) => {
     let bullet = factory.createBullet(fromBody, $bulletSettings.size, collisionGroup);
-    let force = factory.createBulletForce(rads, velocity);
 
     populateWorld(bullet);
     Matter.Body.applyForce(
       bullet,
       bullet.position,
-      force);
+      factory.createBulletForce(rads, velocity));
   }
 
   const onHitBody = (engineInternal, bodyId, onHit) =>

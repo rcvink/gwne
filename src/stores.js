@@ -6,8 +6,17 @@ Matter.use(MatterAttractors);
 const position = {
     x: 0,
     y: 0
-}
+};
 
+export const collisionGroups = readable({
+    player: -1,
+    cpu: -2,
+    bullets: {
+        player: -1,
+        cpu: -2
+    },
+    planet: -3
+});
 export const engine = writable(Matter.Engine.create());
 export const runner = writable(Matter.Runner.create());
 export const render = writable();
