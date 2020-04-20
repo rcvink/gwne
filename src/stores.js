@@ -33,7 +33,7 @@ export const collisionFilters = readable({
         category: categories.cpu,
         mask: categories.bullet.player
     },
-    bullet: {
+    bullets: {
         player: {
             group,
             category: categories.bullet.player,

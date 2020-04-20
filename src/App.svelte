@@ -31,7 +31,7 @@
       $cpu, 
       $cpuRadians, 
       $cpuBulletVelocity,
-      $collisionGroups.bullets.cpu,
+      $collisionFilters.bullets.cpu,
       $densities.bullet);
     setFlagTrueOnHit($engine, $cpu.id, hasHitCpu);
     setFlagTrueOnHit($engine, $player.id, hasHitPlayer);
