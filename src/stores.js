@@ -7,19 +7,49 @@ const position = {
     x: 0,
     y: 0
 };
+const categories = {
+    player: 0x0001,
+    cpu: 0x0002,
+    bullet: {
+        player: 0x0004,
+        cpu: 0x0008,
+    },
+    planet: 0x0016
+};
+const group = 0;
 
 export const densities = readable({
     planet: 0.4,
     bullet: 0.1
 });
-export const collisionGroups = readable({
-    player: -1,
-    cpu: -2,
-    bullets: {
-        player: -1,
-        cpu: -2
+export const collisionFilters = readable({
+    player: {
+        group,
+        category: categories.player,
+        mask: categories.bullet.cpu 
     },
-    planet: -3
+    cpu: {
+        group,
+        category: categories.cpu,
+        mask: categories.bullet.player
+    },
+    bullet: {
+        player: {
+            group,
+            category: categories.bullet.player,
+            mask: categories.cpu | categories.planet
+        },
+        cpu: {
+            group,
+            category: categories.bullet.cpu,
+            mask: categories.player | categories.planet
+        }
+    },
+    planet: {
+        group,
+        category: categories.planet,
+        mask: categories.bullet.player | categories.bullet.cpu
+    }
 });
 export const engine = writable(Matter.Engine.create());
 export const runner = writable(Matter.Runner.create());

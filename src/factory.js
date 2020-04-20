@@ -1,10 +1,10 @@
 import Matter from "matter-js";
 import MatterAttractors from "matter-attractors";
 
-const createPlanet = (x, y, radius, group, density) => {
+const createPlanet = (x, y, radius, collisionFilter, density) => {
   let options = {
     isStatic: true,
-    collisionFilter: { group },
+    collisionFilter,
     plugin: { attractors: [MatterAttractors.Attractors.gravity] }
   };
   let planet = createCircle(x, y, radius, options);
@@ -12,11 +12,11 @@ const createPlanet = (x, y, radius, group, density) => {
   return planet;
 }
 
-const createCpu = (x, y, length, collisionGroup) =>
-  createStaticRectangle(x, y, length, collisionGroup);
+const createCpu = (x, y, length, collisionFilter) =>
+  createStaticRectangle(x, y, length, collisionFilter);
 
-const createPlayer = (x, y, length, collisionGroup) =>
-  createStaticRectangle(x, y, length, collisionGroup);
+const createPlayer = (x, y, length, collisionFilter) =>
+  createStaticRectangle(x, y, length, collisionFilter);
 
 const createRender = (document, canvasId, engine) =>
   Matter.Render.create({
@@ -29,21 +29,21 @@ const createRender = (document, canvasId, engine) =>
     }
   });
 
-const createBullet = (fromBody, size, group, density) =>
+const createBullet = (fromBody, size, collisionFilter, density) =>
   createCircle(
     fromBody.position.x,
     fromBody.position.y,
     size,
-    { density, collisionFilter: { group } });
+    { density, collisionFilter });
 
 const createBulletForce = (radians, velocity) =>
   Matter.Vector.mult(createVector(radians), velocity);
 
-const createStaticRectangle = (x, y, length, group) =>
+const createStaticRectangle = (x, y, length, collisionFilter) =>
   Matter.Bodies.rectangle(x, y, length, length,
     {
       isStatic: true,
-      collisionFilter: { group }
+      collisionFilter
     });
 
 const createCircle = (x, y, radius, options) =>

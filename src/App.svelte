@@ -17,15 +17,15 @@
     cpu,
     cpuRadians,
     cpuBulletVelocity,
-    collisionGroups,
+    collisionFilters,
     densities
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 60, $collisionGroups.planet, $densities.planet);
-    player.set(factory.createPlayer(250, 250, 20, $collisionGroups.player));
-    cpu.set(factory.createCpu(530, 20, 20, $collisionGroups.cpu));
+    let planet = factory.createPlanet(680, 480, 60, $collisionFilters.planet, $densities.planet);
+    player.set(factory.createPlayer(250, 250, 20, $collisionFilters.player));
+    cpu.set(factory.createCpu(530, 20, 20, $collisionFilters.cpu));
     cpuFireOnPlayerFire(
       fireCount, 
       $cpu, 
@@ -43,7 +43,7 @@
       $player, 
       $playerRadians, 
       $bulletSettings.velocity, 
-      $collisionGroups.bullets.player,
+      $collisionFilters.bullets.player,
       $densities.bullet);
     fireCount.update(n => n + 1);
   }
@@ -56,10 +56,10 @@
     world.set($engine.world);
   }
 
-  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionGroup, density) =>
+  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionFilter, density) =>
     fireCountInternal.subscribe((newValue) => {
       if (newValue > 0) {
-        fire(cpuInternal, rads, velocity, collisionGroup, density);
+        fire(cpuInternal, rads, velocity, collisionFilter, density);
       }
     }); 
 
@@ -69,11 +69,11 @@
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
-  const fire = (fromBody, rads, velocity, collisionGroup, density) => {
+  const fire = (fromBody, rads, velocity, collisionFilter, density) => {
     let bullet = factory.createBullet(
       fromBody, 
       $bulletSettings.size, 
-      collisionGroup, 
+      collisionFilter, 
       density);
 
     populateWorld(bullet);
