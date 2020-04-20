@@ -8,13 +8,13 @@ const position = {
     y: 0
 };
 const categories = {
-    player: 0x0001,
-    cpu: 0x0002,
+    player: Matter.Body.nextCategory(),
+    cpu: Matter.Body.nextCategory(),
     bullet: {
-        player: 0x0004,
-        cpu: 0x0008,
+        player: Matter.Body.nextCategory(),
+        cpu: Matter.Body.nextCategory(),
     },
-    planet: 0x0016
+    planet: Matter.Body.nextCategory()
 };
 const group = 0;
 
@@ -37,12 +37,18 @@ export const collisionFilters = readable({
         player: {
             group,
             category: categories.bullet.player,
-            mask: categories.cpu | categories.planet
+            mask: categories.cpu | 
+                categories.planet | 
+                categories.bullet.player | 
+                categories.bullet.cpu
         },
         cpu: {
             group,
             category: categories.bullet.cpu,
-            mask: categories.player | categories.planet
+            mask: categories.player | 
+                categories.planet |
+                categories.bullet.player | 
+                categories.bullet.cpu
         }
     },
     planet: {
