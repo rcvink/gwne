@@ -19,7 +19,7 @@ const categories = {
 const group = 0;
 
 export const densities = readable({
-    planet: 0.4,
+    planet: 2,
     bullet: 0.1
 });
 export const collisionFilters = readable({

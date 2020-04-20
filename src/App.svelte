@@ -23,7 +23,7 @@
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 60, $collisionFilters.planet, $densities.planet);
+    let planet = factory.createPlanet(680, 480, 120, $collisionFilters.planet, $densities.planet);
     player.set(factory.createPlayer(250, 250, 20, $collisionFilters.player));
     cpu.set(factory.createCpu(530, 20, 20, $collisionFilters.cpu));
     cpuFireOnPlayerFire(
