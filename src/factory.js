@@ -1,11 +1,11 @@
 import Matter from "matter-js";
-import MatterAttractors from "matter-attractors";
+import { service } from './service';
 
 const createPlanet = (x, y, radius, collisionFilter, density) => {
   let options = {
     isStatic: true,
     collisionFilter,
-    plugin: { attractors: [MatterAttractors.Attractors.gravity] }
+    plugin: { attractors: [service.gravityOnColliders] }
   };
   let planet = createCircle(x, y, radius, options);
   Matter.Body.setDensity(planet, density);
@@ -39,6 +39,17 @@ const createBullet = (fromBody, size, collisionFilter, density) =>
 const createBulletForce = (radians, velocity) =>
   Matter.Vector.mult(createVector(radians), velocity);
 
+const createParticles = (x, y, count, options) => {
+  let particles = [];
+
+  for (let index = 0; index <= count; index++) {
+    particles.push(
+      createCircle(x, y, Matter.Common.random(1, 5), options));
+  }
+
+  return particles;
+}
+
 const createStaticRectangle = (x, y, length, collisionFilter) =>
   Matter.Bodies.rectangle(x, y, length, length,
     {
@@ -58,5 +69,6 @@ export const factory = {
   createPlayer,
   createRender,
   createBullet,
-  createBulletForce
+  createBulletForce,
+  createParticles
 };

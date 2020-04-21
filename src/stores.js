@@ -14,10 +14,12 @@ const categories = {
         player: Matter.Body.nextCategory(),
         cpu: Matter.Body.nextCategory(),
     },
-    planet: Matter.Body.nextCategory()
+    planet: Matter.Body.nextCategory(),
+    particle: Matter.Body.nextCategory()
 };
 const group = 0;
 
+export const numberOfParticlesInExplosion = readable(20);
 export const densities = readable({
     planet: 2,
     bullet: 0.1
@@ -55,6 +57,10 @@ export const collisionFilters = readable({
         group,
         category: categories.planet,
         mask: categories.bullet.player | categories.bullet.cpu
+    },
+    particle: {
+        group,
+        category: categories.particle,
     }
 });
 export const engine = writable(Matter.Engine.create());

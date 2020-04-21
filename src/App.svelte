@@ -18,7 +18,8 @@
     cpuRadians,
     cpuBulletVelocity,
     collisionFilters,
-    densities
+    densities,
+    numberOfParticlesInExplosion
     } from './stores.js';
 
   onMount(() => {
@@ -35,6 +36,9 @@
       $densities.bullet);
     setFlagTrueOnHit($engine, $cpu.id, hasHitCpu);
     setFlagTrueOnHit($engine, $player.id, hasHitPlayer);
+    explodeOnHit($engine, $cpu.id);
+    explodeOnHit($engine, $player.id);
+    explodeOnHit($engine, planet.id);
     populateWorld([ planet, $player, $cpu ]);
   });
 
@@ -66,8 +70,38 @@
   const setFlagTrueOnHit= (engineInternal, bodyId, flag) =>
     onHitBody(engineInternal, bodyId, () => flag.set(true));
 
+  const explodeOnHit = (engineInternal, idOfSurvivingBody) =>
+    Matter.Events.on(engineInternal, "collisionStart", (event) => 
+      explode(event.pairs[0], idOfSurvivingBody));
+
+  const explode = (pairs, idOfSurvivingBody) => {
+    let bullet;
+
+    if (pairs.bodyA.id === idOfSurvivingBody) {
+      bullet = pairs.bodyB;
+    } else if (pairs.bodyB.id === idOfSurvivingBody) {
+      bullet = pairs.bodyA;
+    } else {
+      return null;
+    }
+
+    populateWorld(
+      factory.createParticles(
+        bullet.position.x, 
+        bullet.position.y, 
+        $numberOfParticlesInExplosion, 
+        { 
+          collisionFilter: $collisionFilters.particle,
+          density: $densities.bullet,
+        }));
+    removeFromWorld(bullet);
+  }
+
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
+
+  const removeFromWorld = (objectsToRemove) =>
+    Matter.World.remove($world, objectsToRemove);
 
   const fire = (fromBody, rads, velocity, collisionFilter, density) => {
     let bullet = factory.createBullet(
