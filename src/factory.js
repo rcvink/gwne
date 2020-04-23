@@ -8,7 +8,8 @@ const createPlanet = (x, y, radius, collisionFilter, density) => {
     plugin: { attractors: [service.gravityOnColliders] },
     render: {
       fillStyle: "saddlebrown"
-    }
+    },
+    sleepThreshold: 1e10
   };
   let planet = createCircle(x, y, radius, options);
   Matter.Body.setDensity(planet, density);
@@ -21,7 +22,8 @@ const createCpu = (x, y, length, collisionFilter) =>
     isStatic: true,
     render: {
       fillStyle: "firebrick"
-    }
+    },
+    sleepThreshold: 1e10
   });
 
 const createPlayer = (x, y, length, collisionFilter) =>
@@ -30,7 +32,8 @@ const createPlayer = (x, y, length, collisionFilter) =>
     isStatic: true,
     render: {
       fillStyle: "darkslateblue"
-    }
+    },
+    sleepThreshold: 1e10
   });
 
 const createRender = (document, canvasId, engine) =>
@@ -59,19 +62,21 @@ const createParticles = (x, y, count, options) => {
 
   for (let index = 0; index <= count; index++) {
     particles.push(
-      createCircle(x, y, Matter.Common.random(1, 5), options));
+      createCircle(x, y, Matter.Common.random(1, 4), options));
   }
 
   return particles;
 }
 
-const createTrail = (x, y, collisionFilter) => 
-  createSquare(x, y, 2, { 
+const createTrail = (x, y, size, collisionFilter) => 
+  createSquare(x, y, size, { 
     isStatic: true,
+    isSensor: true,
     collisionFilter,
     render: {
-      fillStyle: "lightslategray"
-    }
+      fillStyle: "orange"
+    },
+    sleepThreshold: 120
   });
 
 const createSquare = (x, y, length, options) =>

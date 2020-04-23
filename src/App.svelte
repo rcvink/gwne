@@ -20,7 +20,7 @@
     collisionFilters,
     densities,
     numberOfParticlesInExplosion,
-    categories,
+    categories
     } from './stores.js';
 
   onMount(() => {
@@ -41,6 +41,9 @@
     explodeOnHit($engine, $player.id);
     explodeOnHit($engine, planet.id);
     trailBullets($engine, $world);
+    trailParticles($engine, $world);
+    removeSleepingParticles($engine, $world);
+    removeSleepingTrails($engine, $world);
     populateWorld([ planet, $player, $cpu ]);
   });
 
@@ -87,37 +90,77 @@
       return null;
     }
 
-    populateWorld(
-      factory.createParticles(
+    let particles = factory.createParticles(
         bullet.position.x, 
         bullet.position.y, 
         $numberOfParticlesInExplosion, 
         { 
           collisionFilter: $collisionFilters.particle,
           density: $densities.bullet,
-        }));
+          render: {
+            fillStyle: "orange"
+          },
+          sleepThreshold: 120
+        });
+
+    populateWorld(particles);
     removeFromWorld(bullet);
   }
 
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
-  const removeFromWorld = (objectsToRemove) =>
+  const removeFromWorld = (objectsToRemove) => {
     Matter.World.remove($world, objectsToRemove);
+  }
 
-  const trailBullets = (engineInternal, worldInternal) => {
+  const removeSleepingParticles = (engineInternal, worldInternal) =>
     Matter.Events.on(engineInternal, "afterUpdate", (event) => {
-      let bulletCategories = [ 
-        categories.bullet.player, 
-        categories.bullet.cpu ];
+      let sleepingParticles = Matter.Composite
+        .allBodies(worldInternal)
+        .filter(body => body.collisionFilter.category === categories.particle)
+        .filter(particle => particle.isSleeping);
+      sleepingParticles.forEach(particle => {
+        removeFromWorld(particle);
+      });
+    });
+
+  const removeSleepingTrails = (engineInternal, worldInternal) =>
+    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
+      let sleepingParticles = Matter.Composite
+        .allBodies(worldInternal)
+        .filter(body => body.collisionFilter.category === categories.trail)
+        .filter(particle => particle.isSleeping);
+      sleepingParticles.forEach(particle => {
+        removeFromWorld(particle);
+      });
+    });
+
+  const trailBullets = (engineInternal, worldInternal) => 
+    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
       let bullets = Matter.Composite
         .allBodies(worldInternal)
-        .filter(body => 
-          bulletCategories.includes(body.collisionFilter.category));
+        .filter(body =>
+          body.collisionFilter.category === categories.bullet.player || 
+          body.collisionFilter.category === categories.bullet.cpu);
       bullets.forEach(bullet => 
         populateWorld(factory.createTrail(
           bullet.position.x, 
           bullet.position.y, 
+          2,
+          $collisionFilters.trail)));
+    });
+
+  const trailParticles = (engineInternal, worldInternal) => {
+    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
+      let particles = Matter.Composite
+        .allBodies(worldInternal)
+        .filter(body => body.collisionFilter.category === categories.particle);
+      particles.forEach(particle => 
+        populateWorld(factory.createTrail(
+          particle.position.x, 
+          particle.position.y,
+          1, 
           $collisionFilters.trail)));
     });
   }
@@ -128,7 +171,7 @@
       $bulletSettings.size, 
       collisionFilter, 
       density);
-
+      
     populateWorld(bullet);
     Matter.Body.applyForce(
       bullet,
