@@ -5,7 +5,10 @@ const createPlanet = (x, y, radius, collisionFilter, density) => {
   let options = {
     isStatic: true,
     collisionFilter,
-    plugin: { attractors: [service.gravityOnColliders] }
+    plugin: { attractors: [service.gravityOnColliders] },
+    render: {
+      fillStyle: "saddlebrown"
+    }
   };
   let planet = createCircle(x, y, radius, options);
   Matter.Body.setDensity(planet, density);
@@ -13,10 +16,22 @@ const createPlanet = (x, y, radius, collisionFilter, density) => {
 }
 
 const createCpu = (x, y, length, collisionFilter) =>
-  createStaticRectangle(x, y, length, collisionFilter);
+  createSquare(x, y, length, { 
+    collisionFilter,
+    isStatic: true,
+    render: {
+      fillStyle: "firebrick"
+    }
+  });
 
 const createPlayer = (x, y, length, collisionFilter) =>
-  createStaticRectangle(x, y, length, collisionFilter);
+  createSquare(x, y, length, { 
+    collisionFilter,
+    isStatic: true,
+    render: {
+      fillStyle: "darkslateblue"
+    }
+  });
 
 const createRender = (document, canvasId, engine) =>
   Matter.Render.create({
@@ -50,12 +65,17 @@ const createParticles = (x, y, count, options) => {
   return particles;
 }
 
-const createStaticRectangle = (x, y, length, collisionFilter) =>
-  Matter.Bodies.rectangle(x, y, length, length,
-    {
-      isStatic: true,
-      collisionFilter
-    });
+const createTrail = (x, y, collisionFilter) => 
+  createSquare(x, y, 2, { 
+    isStatic: true,
+    collisionFilter,
+    render: {
+      fillStyle: "lightslategray"
+    }
+  });
+
+const createSquare = (x, y, length, options) =>
+  Matter.Bodies.rectangle(x, y, length, length, options);
 
 const createCircle = (x, y, radius, options) =>
   Matter.Bodies.circle(x, y, radius, options);
@@ -70,5 +90,6 @@ export const factory = {
   createRender,
   createBullet,
   createBulletForce,
-  createParticles
+  createParticles,
+  createTrail
 };

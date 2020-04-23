@@ -19,7 +19,8 @@
     cpuBulletVelocity,
     collisionFilters,
     densities,
-    numberOfParticlesInExplosion
+    numberOfParticlesInExplosion,
+    categories,
     } from './stores.js';
 
   onMount(() => {
@@ -39,6 +40,7 @@
     explodeOnHit($engine, $cpu.id);
     explodeOnHit($engine, $player.id);
     explodeOnHit($engine, planet.id);
+    trailBullets($engine, $world);
     populateWorld([ planet, $player, $cpu ]);
   });
 
@@ -102,6 +104,23 @@
 
   const removeFromWorld = (objectsToRemove) =>
     Matter.World.remove($world, objectsToRemove);
+
+  const trailBullets = (engineInternal, worldInternal) => {
+    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
+      let bulletCategories = [ 
+        categories.bullet.player, 
+        categories.bullet.cpu ];
+      let bullets = Matter.Composite
+        .allBodies(worldInternal)
+        .filter(body => 
+          bulletCategories.includes(body.collisionFilter.category));
+      bullets.forEach(bullet => 
+        populateWorld(factory.createTrail(
+          bullet.position.x, 
+          bullet.position.y, 
+          $collisionFilters.trail)));
+    });
+  }
 
   const fire = (fromBody, rads, velocity, collisionFilter, density) => {
     let bullet = factory.createBullet(

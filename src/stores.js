@@ -7,7 +7,7 @@ const position = {
     x: 0,
     y: 0
 };
-const categories = {
+export const categories = {
     player: Matter.Body.nextCategory(),
     cpu: Matter.Body.nextCategory(),
     bullet: {
@@ -15,7 +15,8 @@ const categories = {
         cpu: Matter.Body.nextCategory(),
     },
     planet: Matter.Body.nextCategory(),
-    particle: Matter.Body.nextCategory()
+    particle: Matter.Body.nextCategory(),
+    trail: Matter.Body.nextCategory()
 };
 const group = 0;
 
@@ -61,6 +62,10 @@ export const collisionFilters = readable({
     particle: {
         group,
         category: categories.particle,
+    },
+    trail: {
+        group,
+        category: categories.trail,
     }
 });
 export const engine = writable(Matter.Engine.create());
