@@ -2,6 +2,7 @@
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
+  import { CONSTANTS } from './constants';
   import { factory } from './factory.js';
   import { 
     engine,
@@ -16,48 +17,31 @@
     fireCount,
     cpu,
     cpuRadians,
-    cpuBulletVelocity,
-    collisionFilters,
-    densities,
-    numberOfParticlesInExplosion,
-    categories
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 120, $collisionFilters.planet, $densities.planet);
-    player.set(factory.createPlayer(250, 250, 20, $collisionFilters.player));
-    cpu.set(factory.createCpu(530, 20, 20, $collisionFilters.cpu));
-    cpuFireOnPlayerFire(
-      fireCount, 
-      $cpu, 
-      $cpuRadians, 
-      $cpuBulletVelocity,
-      $collisionFilters.bullets.cpu,
-      $densities.bullet);
-    setFlagTrueOnHit($engine, $cpu.id, hasHitCpu);
-    setFlagTrueOnHit($engine, $player.id, hasHitPlayer);
-    explodeOnHit($engine, $cpu.id);
-    explodeOnHit($engine, $player.id);
-    explodeOnHit($engine, planet.id);
-    trailBullets($engine, $world);
-    trailParticles($engine, $world);
-    removeSleepingParticles($engine, $world);
-    removeSleepingTrails($engine, $world);
+    let planet = factory.createPlanet(680, 480, 120);
+    player.set(factory.createPlayer(250, 250, 20));
+    cpu.set(factory.createCpu(530, 20, 20));
+    cpuFireOnPlayerFire($cpuRadians);
+    setFlagTrueOnHit($cpu.id, hasHitCpu);
+    setFlagTrueOnHit($player.id, hasHitPlayer);
+    explodeOnHitFromAnyBullet($cpu.id);
+    explodeOnHitFromAnyBullet($player.id);
+    explodeOnHitFromAnyBullet(planet.id);
+    trailOnUpdate([ 
+      CONSTANTS.CATEGORIES.bullet.cpu, 
+      CONSTANTS.CATEGORIES.bullet.player ], 2);
+    trailOnUpdate(
+      [ CONSTANTS.CATEGORIES.particle ], 1);
+    removeSleepingOnUpdate(
+      [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
     populateWorld([ planet, $player, $cpu ]);
   });
 
-  const onClick = () => {
-    fire(
-      $player, 
-      $playerRadians, 
-      $bulletSettings.velocity, 
-      $collisionFilters.bullets.player,
-      $densities.bullet);
-    fireCount.update(n => n + 1);
-  }
-
   const setupMatter = () => {
+    Matter.use(MatterAttractors);
     render.set(factory.createRender(document, "canvas", $engine));
     Matter.Runner.run($runner, $engine);
     Matter.Render.run($render);
@@ -65,113 +49,64 @@
     world.set($engine.world);
   }
 
-  const cpuFireOnPlayerFire = (fireCountInternal, cpuInternal, rads, velocity, collisionFilter, density) =>
-    fireCountInternal.subscribe((newValue) => {
+  const cpuFireOnPlayerFire = (rads) =>
+    fireCount.subscribe((newValue) => {
       if (newValue > 0) {
-        fire(cpuInternal, rads, velocity, collisionFilter, density);
+        fire(
+          $cpu, rads, CONSTANTS.CPU_BULLET_VELOCITY, CONSTANTS.COLLISION_FILTERS.bullets.cpu);
       }
-    }); 
+    });
 
-  const setFlagTrueOnHit= (engineInternal, bodyId, flag) =>
-    onHitBody(engineInternal, bodyId, () => flag.set(true));
+  const setFlagTrueOnHit= (bodyId, flag) =>
+    Matter.Events.on($engine, "collisionStart", (event) => {
+      let pairs = event.pairs[0];
+      if (pairs.bodyA.id === bodyId || pairs.bodyB.id === bodyId) {
+        flag.set(true);
+      }
+    });
 
-  const explodeOnHit = (engineInternal, idOfSurvivingBody) =>
-    Matter.Events.on(engineInternal, "collisionStart", (event) => 
-      explode(event.pairs[0], idOfSurvivingBody));
+  const explodeOnHitFromAnyBullet = (idOfSurvivingBody) =>
+    Matter.Events.on($engine, "collisionStart", (event) => {
+      let bullet;
+      let pairs = event.pairs[0];
 
-  const explode = (pairs, idOfSurvivingBody) => {
-    let bullet;
+      if (pairs.bodyA.id === idOfSurvivingBody) {
+        bullet = pairs.bodyB;
+      } else if (pairs.bodyB.id === idOfSurvivingBody) {
+        bullet = pairs.bodyA;
+      } else {
+        return null;
+      }
 
-    if (pairs.bodyA.id === idOfSurvivingBody) {
-      bullet = pairs.bodyB;
-    } else if (pairs.bodyB.id === idOfSurvivingBody) {
-      bullet = pairs.bodyA;
-    } else {
-      return null;
-    }
+      let particles = factory.createParticles(bullet);
+      populateWorld(particles);
+      removeFromWorld(bullet);
+    });
 
-    let particles = factory.createParticles(
-        bullet.position.x, 
-        bullet.position.y, 
-        $numberOfParticlesInExplosion, 
-        { 
-          collisionFilter: $collisionFilters.particle,
-          density: $densities.bullet,
-          render: {
-            fillStyle: "orange"
-          },
-          sleepThreshold: 120
-        });
+  const trailOnUpdate = (categoriesToTrail, trailSize) =>
+    Matter.Events.on($engine, "afterUpdate", (event) => 
+      Matter.Composite
+        .allBodies($world)
+        .filter(body => categoriesToTrail.includes(body.collisionFilter.category))
+        .forEach(bodyToTrail => populateWorld(factory.createTrail(bodyToTrail, trailSize))));
 
-    populateWorld(particles);
-    removeFromWorld(bullet);
-  }
+  const removeSleepingOnUpdate = (categoriesToRemove) => 
+    Matter.Events.on($engine, "afterUpdate", (event) =>
+      Matter.Composite
+        .allBodies($world)
+        .filter(body => body.isSleeping)
+        .filter(sleepingBody => categoriesToRemove.includes(sleepingBody.collisionFilter.category))
+        .forEach(bodyToRemove => removeFromWorld(bodyToRemove)));
 
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
-  const removeFromWorld = (objectsToRemove) => {
-    Matter.World.remove($world, objectsToRemove);
-  }
-
-  const removeSleepingParticles = (engineInternal, worldInternal) =>
-    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
-      let sleepingParticles = Matter.Composite
-        .allBodies(worldInternal)
-        .filter(body => body.collisionFilter.category === categories.particle)
-        .filter(particle => particle.isSleeping);
-      sleepingParticles.forEach(particle => {
-        removeFromWorld(particle);
-      });
-    });
-
-  const removeSleepingTrails = (engineInternal, worldInternal) =>
-    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
-      let sleepingParticles = Matter.Composite
-        .allBodies(worldInternal)
-        .filter(body => body.collisionFilter.category === categories.trail)
-        .filter(particle => particle.isSleeping);
-      sleepingParticles.forEach(particle => {
-        removeFromWorld(particle);
-      });
-    });
-
-  const trailBullets = (engineInternal, worldInternal) => 
-    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
-      let bullets = Matter.Composite
-        .allBodies(worldInternal)
-        .filter(body =>
-          body.collisionFilter.category === categories.bullet.player || 
-          body.collisionFilter.category === categories.bullet.cpu);
-      bullets.forEach(bullet => 
-        populateWorld(factory.createTrail(
-          bullet.position.x, 
-          bullet.position.y, 
-          2,
-          $collisionFilters.trail)));
-    });
-
-  const trailParticles = (engineInternal, worldInternal) => {
-    Matter.Events.on(engineInternal, "afterUpdate", (event) => {
-      let particles = Matter.Composite
-        .allBodies(worldInternal)
-        .filter(body => body.collisionFilter.category === categories.particle);
-      particles.forEach(particle => 
-        populateWorld(factory.createTrail(
-          particle.position.x, 
-          particle.position.y,
-          1, 
-          $collisionFilters.trail)));
-    });
-  }
-
-  const fire = (fromBody, rads, velocity, collisionFilter, density) => {
+  const fire = (fromBody, rads, velocity, collisionFilter) => {
     let bullet = factory.createBullet(
       fromBody, 
       $bulletSettings.size, 
-      collisionFilter, 
-      density);
-      
+      collisionFilter);
+
     populateWorld(bullet);
     Matter.Body.applyForce(
       bullet,
@@ -179,13 +114,18 @@
       factory.createBulletForce(rads, velocity));
   }
 
-  const onHitBody = (engineInternal, bodyId, onHit) =>
-    Matter.Events.on(engineInternal, "collisionStart", (event) => {
-      let pairs = event.pairs[0];
-      if (pairs.bodyA.id === bodyId || pairs.bodyB.id === bodyId) {
-        onHit();
-      }
-    });
+  const removeFromWorld = (objectsToRemove) => {
+    Matter.World.remove($world, objectsToRemove);
+  }
+
+  const onClick = () => {
+    fire(
+      $player, 
+      $playerRadians, 
+      $bulletSettings.velocity, 
+      CONSTANTS.COLLISION_FILTERS.bullets.player);
+    fireCount.update(n => n + 1);
+  }
 
 </script>
 

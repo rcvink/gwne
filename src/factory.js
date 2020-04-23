@@ -1,40 +1,19 @@
 import Matter from "matter-js";
+import { CONSTANTS } from './constants'
 import { service } from './service';
 
-const createPlanet = (x, y, radius, collisionFilter, density) => {
-  let options = {
-    isStatic: true,
-    collisionFilter,
-    plugin: { attractors: [service.gravityOnColliders] },
-    render: {
-      fillStyle: "saddlebrown"
-    },
-    sleepThreshold: 1e10
-  };
-  let planet = createCircle(x, y, radius, options);
-  Matter.Body.setDensity(planet, density);
+const createPlanet = (x, y, radius) => {
+  let planet = createCircle(x, y, radius, CONSTANTS.PLANET_OPTIONS);
+  Matter.Body.setDensity(planet, CONSTANTS.DENSITIES.planet);
+  planet.plugin = { attractors: [ service.gravityOnColliders ] };
   return planet;
 }
 
-const createCpu = (x, y, length, collisionFilter) =>
-  createSquare(x, y, length, { 
-    collisionFilter,
-    isStatic: true,
-    render: {
-      fillStyle: "firebrick"
-    },
-    sleepThreshold: 1e10
-  });
+const createPlayer = (x, y, length) =>
+    createSquare(x, y, length, CONSTANTS.PLAYER_OPTIONS);
 
-const createPlayer = (x, y, length, collisionFilter) =>
-  createSquare(x, y, length, { 
-    collisionFilter,
-    isStatic: true,
-    render: {
-      fillStyle: "darkslateblue"
-    },
-    sleepThreshold: 1e10
-  });
+const createCpu = (x, y, length) =>
+    createSquare(x, y, length, CONSTANTS.CPU_OPTIONS);
 
 const createRender = (document, canvasId, engine) =>
   Matter.Render.create({
@@ -47,37 +26,39 @@ const createRender = (document, canvasId, engine) =>
     }
   });
 
-const createBullet = (fromBody, size, collisionFilter, density) =>
+const createBullet = (fromBody, size, collisionFilter) =>
   createCircle(
     fromBody.position.x,
     fromBody.position.y,
     size,
-    { density, collisionFilter });
+    { 
+      collisionFilter, 
+      density: CONSTANTS.DENSITIES.bullet, 
+    });
 
 const createBulletForce = (radians, velocity) =>
   Matter.Vector.mult(createVector(radians), velocity);
 
-const createParticles = (x, y, count, options) => {
+const createParticles = (fromBody) => {
   let particles = [];
 
-  for (let index = 0; index <= count; index++) {
-    particles.push(
-      createCircle(x, y, Matter.Common.random(1, 4), options));
+  for (let i = 0; i <= CONSTANTS.EXPLOSION_PARTICLE_COUNT; i++) {
+    particles.push(createCircle(
+      fromBody.position.x, 
+      fromBody.position.y, 
+      Matter.Common.random(1, 4), 
+      CONSTANTS.PARTICLE_OPTIONS));
   }
 
   return particles;
 }
 
-const createTrail = (x, y, size, collisionFilter) => 
-  createSquare(x, y, size, { 
-    isStatic: true,
-    isSensor: true,
-    collisionFilter,
-    render: {
-      fillStyle: "orange"
-    },
-    sleepThreshold: 120
-  });
+const createTrail = (fromBody, size) => 
+  createSquare(
+    fromBody.position.x, 
+    fromBody.position.y, 
+    size, 
+    CONSTANTS.TRAIL_OPTIONS);
 
 const createSquare = (x, y, length, options) =>
   Matter.Bodies.rectangle(x, y, length, length, options);
