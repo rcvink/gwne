@@ -11,33 +11,20 @@
     world, 
     player, 
     bulletSettings, 
-    hasHitCpu,
-    hasHitPlayer,
     playerRadians,
     fireCount,
     cpu,
     cpuRadians,
+    level,
+    planet,
+    playerScore,
+    cpuScore
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
-    let planet = factory.createPlanet(680, 480, 120);
-    player.set(factory.createPlayer(250, 250, 20));
-    cpu.set(factory.createCpu(530, 20, 20));
-    cpuFireOnPlayerFire($cpuRadians);
-    setFlagTrueOnHit($cpu.id, hasHitCpu);
-    setFlagTrueOnHit($player.id, hasHitPlayer);
-    explodeOnHitFromAnyBullet($cpu.id);
-    explodeOnHitFromAnyBullet($player.id);
-    explodeOnHitFromAnyBullet(planet.id);
-    trailOnUpdate([ 
-      CONSTANTS.CATEGORIES.bullet.cpu, 
-      CONSTANTS.CATEGORIES.bullet.player ], 2);
-    trailOnUpdate(
-      [ CONSTANTS.CATEGORIES.particle ], 1);
-    removeSleepingOnUpdate(
-      [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
-    populateWorld([ planet, $player, $cpu ]);
+    startNewLevel();
+    setupGlobalListeners();
   });
 
   const setupMatter = () => {
@@ -49,31 +36,81 @@
     world.set($engine.world);
   }
 
-  const cpuFireOnPlayerFire = (rads) =>
+  const setupGlobalListeners = () => {
+    cpuFireOnPlayerFire();
+    winOrLoseOnHit();
+    bulletsExplodeOnCollisionWithCategory(
+      CONSTANTS.CATEGORIES.cpu, 
+      true);
+    bulletsExplodeOnCollisionWithCategory(
+      CONSTANTS.CATEGORIES.player, 
+      true);
+    bulletsExplodeOnCollisionWithCategory(
+      CONSTANTS.CATEGORIES.planet, 
+      false);
+    trailOnUpdate([ 
+      CONSTANTS.CATEGORIES.bullet.cpu, 
+      CONSTANTS.CATEGORIES.bullet.player ], 2);
+    trailOnUpdate(
+      [ CONSTANTS.CATEGORIES.particle ], 1);
+    removeSleepingOnUpdate(
+      [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
+  }
+
+  const startNewLevel = () => {
+    removeFromWorld(Matter.Composite.allBodies($world));
+    planet.set(factory.createPlanet(
+      $render.options.width, 
+      $render.options.height));
+    player.set(factory.createPlayer(
+      $render.options.width,
+      $render.options.height,
+      20));
+    cpu.set(factory.createCpu(
+      $render.options.width,
+      $render.options.height, 
+      20));
+    populateWorld([ $planet, $player, $cpu ]);
+    level.update(n => n + 1);
+    fireCount.update(n => n = 0);
+  }
+
+  const cpuFireOnPlayerFire = () =>
     fireCount.subscribe((newValue) => {
       if (newValue > 0) {
         fire(
-          $cpu, rads, CONSTANTS.CPU_BULLET_VELOCITY, CONSTANTS.COLLISION_FILTERS.bullets.cpu);
+          $cpu, 
+          $cpuRadians, 
+          CONSTANTS.CPU_BULLET_VELOCITY, 
+          CONSTANTS.COLLISION_FILTERS.bullets.cpu);
       }
     });
 
-  const setFlagTrueOnHit= (bodyId, flag) =>
+  const winOrLoseOnHit = () => 
     Matter.Events.on($engine, "collisionStart", (event) => {
       let pairs = event.pairs[0];
-      if (pairs.bodyA.id === bodyId || pairs.bodyB.id === bodyId) {
-        flag.set(true);
-      }
+      if (pairs.bodyA.id === $cpu.id || pairs.bodyB.id === $cpu.id) {
+        playerScore.update(n => n + 1);
+        startNewLevel();
+      } else if (pairs.bodyA.id === $player.id || pairs.bodyB.id === $cpu.id) {
+        cpuScore.update(n => n + 1);
+        startNewLevel();
+      } 
     });
 
-  const explodeOnHitFromAnyBullet = (idOfSurvivingBody) =>
+  const bulletsExplodeOnCollisionWithCategory = (
+    category, 
+    shouldDestroyNonBullet) =>
     Matter.Events.on($engine, "collisionStart", (event) => {
-      let bullet;
+      let bullet, other;
       let pairs = event.pairs[0];
 
-      if (pairs.bodyA.id === idOfSurvivingBody) {
+      if (pairs.bodyA.collisionFilter.category === category) {
         bullet = pairs.bodyB;
-      } else if (pairs.bodyB.id === idOfSurvivingBody) {
+        other = pairs.bodyA;
+      } else if (pairs.bodyB.collisionFilter.category === category) {
         bullet = pairs.bodyA;
+        other = pairs.bodyB;
       } else {
         return null;
       }
@@ -81,6 +118,10 @@
       let particles = factory.createParticles(bullet);
       populateWorld(particles);
       removeFromWorld(bullet);
+
+      if (shouldDestroyNonBullet) {
+        removeFromWorld(other);
+      }
     });
 
   const trailOnUpdate = (categoriesToTrail, trailSize) =>
@@ -142,20 +183,16 @@
   <input type="number" bind:value={$bulletSettings.velocity} min="1" max="10"/>
 </div>
 <div>
-  {#if $hasHitPlayer}
-    Hit player!
-  {:else}
-    Player OK.
-  {/if}
+  level: {$level}
 </div>
 <div>
-  {#if $hasHitCpu}
-    Hit CPU!
-  {:else}
-    CPU OK.
-  {/if}
+  shots fired: {$fireCount}
 </div>
 <div>
-  {$fireCount} shots fired.
+  player score: {$playerScore}
 </div>
-<div id="canvas" on:click={onClick}/>
+<div>
+  cpu score: {$cpuScore}
+</div>
+
+<div id="canvas" on:click={onClick} />

@@ -2,18 +2,64 @@ import Matter from "matter-js";
 import { CONSTANTS } from './constants'
 import { service } from './service';
 
-const createPlanet = (x, y, radius) => {
-  let planet = createCircle(x, y, radius, CONSTANTS.PLANET_OPTIONS);
+const createPlanet = (renderWidth, renderHeight) => {
+  let { x, y, r } = getPlanetDimensions(renderWidth, renderHeight);
+  let planet = createCircle(x, y, r, CONSTANTS.PLANET_OPTIONS);
   Matter.Body.setDensity(planet, CONSTANTS.DENSITIES.planet);
   planet.plugin = { attractors: [ service.gravityOnColliders ] };
   return planet;
 }
 
-const createPlayer = (x, y, length) =>
-    createSquare(x, y, length, CONSTANTS.PLAYER_OPTIONS);
+const getPlanetDimensions = (renderWidth, renderHeight) => {
+  let rMax = Math.min(renderWidth / 8, renderHeight / 8);
+  let r = getRandomInRange(60, rMax); 
+  let x = getRandomInRange(
+    (renderWidth / 5) + r,
+    (3 * renderWidth / 5) - r
+  );
+  let y = getRandomInRange(
+    r + 10,
+    renderHeight - r
+  );
+  return { x, y, r };
+}
 
-const createCpu = (x, y, length) =>
-    createSquare(x, y, length, CONSTANTS.CPU_OPTIONS);
+const getRandomInRange = (min, max) => 
+  Math.random() * (max - min) + min;
+
+const createPlayer = (renderWidth, renderHeight, length) => {
+  let { x, y } = getPlayerDimensions(renderWidth, renderHeight, length);
+  return createSquare(x, y, length, CONSTANTS.PLAYER_OPTIONS);
+}
+
+const getPlayerDimensions = (renderWidth, renderHeight, length) => {
+  let x = getRandomInRange(
+    (length / 2) + 10,
+    (renderWidth / 5) - (length / 2)
+  );
+  let y = getRandomInRange(
+    (length / 2) + 10,
+    (renderHeight) - (length / 2)
+  );
+  return { x, y };
+}
+
+const createCpu = (renderWidth, renderHeight, length) => {
+  let { x, y } = getCpuDimensions(renderWidth, renderHeight, length);
+  return createSquare(x, y, length, CONSTANTS.CPU_OPTIONS);
+}
+
+const getCpuDimensions = (renderWidth, renderHeight, length) => {
+  let x = getRandomInRange(
+    (4 * renderWidth / 5) + (length / 2),
+    renderWidth - (length / 2) - 10
+  );
+  let y = getRandomInRange(
+    (length / 2) + 10,
+    renderHeight - (length / 2) - 10 
+  );
+  return { x, y };
+}
 
 const createRender = (document, canvasId, engine) =>
   Matter.Render.create({

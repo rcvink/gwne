@@ -1,4 +1,4 @@
-import { writable, derived, readable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import Matter from "matter-js";
 
 const position = {
@@ -13,13 +13,13 @@ export const render = writable();
 export const world = writable();
 export const player = writable({ position });
 export const cpu = writable({ position });
+export const planet = writable({ position });
 export const bulletSettings = writable({
     size: 3,
     angleDegrees: 320,
     velocity: 7
 });
-export const hasHitCpu = writable(false);
-export const hasHitPlayer = writable(false);
+export const level = writable(0);
 export const playerRadians = derived(
     bulletSettings,
     $bulletSettings => ($bulletSettings.angleDegrees * Math.PI) / 180);
@@ -30,3 +30,5 @@ export const cpuRadians = derived(
             ($player.position.y - $cpu.position.y), 
             ($player.position.x - $cpu.position.x)));
 export const fireCount = writable(0);
+export const playerScore = writable(0);
+export const cpuScore = writable(0);
