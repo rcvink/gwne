@@ -24,19 +24,36 @@
   onMount(() => {
     setupMatter();
     startNewLevel();
-    setupGlobalListeners();
+    registerPermanentListeners();
   });
 
   const setupMatter = () => {
     Matter.use(MatterAttractors);
-    render.set(factory.createRender(document, "canvas", $engine));
+    render.set(factory.createRender(document, $engine));
     Matter.Runner.run($runner, $engine);
     Matter.Render.run($render);
     $engine.world.gravity.scale = 0;
     world.set($engine.world);
   }
 
-  const setupGlobalListeners = () => {
+  const startNewLevel = () => {
+    removeFromWorld(
+      Matter.Composite.allBodies($world));
+    planet.set(factory.createPlanet(
+      $render.options.width, 
+      $render.options.height));
+    player.set(factory.createPlayer(
+      $render.options.width,
+      $render.options.height));
+    cpu.set(factory.createCpu(
+      $render.options.width,
+      $render.options.height)); 
+    populateWorld([ $planet, $player, $cpu ]);
+    level.update(n => n + 1);
+    fireCount.set(0);
+  }
+
+  const registerPermanentListeners = () => {
     cpuFireOnPlayerFire();
     winOrLoseOnHit();
     bulletsExplodeOnCollisionWithCategory(
@@ -50,29 +67,13 @@
       false);
     trailOnUpdate([ 
       CONSTANTS.CATEGORIES.bullet.cpu, 
-      CONSTANTS.CATEGORIES.bullet.player ], 2);
+      CONSTANTS.CATEGORIES.bullet.player ],
+      CONSTANTS.TRAIL_BULLET_SIZE);
     trailOnUpdate(
-      [ CONSTANTS.CATEGORIES.particle ], 1);
+      [ CONSTANTS.CATEGORIES.particle ],
+      CONSTANTS.TRAIL_PARTICLE_SIZE);
     removeSleepingOnUpdate(
       [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
-  }
-
-  const startNewLevel = () => {
-    removeFromWorld(Matter.Composite.allBodies($world));
-    planet.set(factory.createPlanet(
-      $render.options.width, 
-      $render.options.height));
-    player.set(factory.createPlayer(
-      $render.options.width,
-      $render.options.height,
-      20));
-    cpu.set(factory.createCpu(
-      $render.options.width,
-      $render.options.height, 
-      20));
-    populateWorld([ $planet, $player, $cpu ]);
-    level.update(n => n + 1);
-    fireCount.update(n => n = 0);
   }
 
   const cpuFireOnPlayerFire = () =>
@@ -145,7 +146,6 @@
   const fire = (fromBody, rads, velocity, collisionFilter) => {
     let bullet = factory.createBullet(
       fromBody, 
-      $bulletSettings.size, 
       collisionFilter);
 
     populateWorld(bullet);
@@ -155,9 +155,8 @@
       factory.createBulletForce(rads, velocity));
   }
 
-  const removeFromWorld = (objectsToRemove) => {
+  const removeFromWorld = (objectsToRemove) =>
     Matter.World.remove($world, objectsToRemove);
-  }
 
   const onClick = () => {
     fire(
@@ -170,10 +169,6 @@
 
 </script>
 
-<div>
-  size:
-  <input type="number" bind:value={$bulletSettings.size} min="3" max="20"/>
-</div>
 <div>
   angle:
   <input type="number" bind:value={$bulletSettings.angleDegrees} min="0" max="359"/>
@@ -195,4 +190,4 @@
   cpu score: {$cpuScore}
 </div>
 
-<div id="canvas" on:click={onClick} />
+<div id="{CONSTANTS.CANVAS_ID}" on:click={onClick} />

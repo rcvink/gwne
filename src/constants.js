@@ -4,6 +4,8 @@ const SLEEP_THRESHOLD_LONG = 1e10;
 const SLEEP_THRESHOLD_SHORT = 120;
 const group = 0;
 
+const BULLET_SIZE = 3;
+const CANVAS_ID = "canvas";
 const CATEGORIES = {
     player: Matter.Body.nextCategory(),
     cpu: Matter.Body.nextCategory(),
@@ -69,6 +71,7 @@ const CPU_OPTIONS = {
     },
     sleepThreshold: SLEEP_THRESHOLD_LONG
 };
+const CPU_LENGTH = 20;
 const DENSITIES = {
     planet: 2,
     bullet: 5,
@@ -84,6 +87,8 @@ const PARTICLE_OPTIONS = {
     },
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
 };
+const PARTICLE_SIZE_MIN = 1;
+const PARTICLE_SIZE_MAX = 4;
 const PLANET_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.planet,
@@ -100,6 +105,11 @@ const PLAYER_OPTIONS = {
     },
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
+const PLAYER_LENGTH = 20;
+const RENDER_MAX_WIDTH = 1024;
+const RENDER_MAX_HEIGHT = 720;
+const TRAIL_BULLET_SIZE = 2;
+const TRAIL_PARTICLE_SIZE = 1;
 const TRAIL_OPTIONS = {
     isStatic: true,
     isSensor: true,
@@ -111,15 +121,25 @@ const TRAIL_OPTIONS = {
 };
 
 export const CONSTANTS = { 
+    BULLET_SIZE,
+    CANVAS_ID,
     CATEGORIES,
     COLLISION_FILTERS,
     CPU_BULLET_VELOCITY,
+    CPU_LENGTH,
     CPU_OPTIONS,
     DENSITIES,
     EXPLOSION_PARTICLE_COUNT,
     GRAVITATIONAL_CONSTANT,
     PARTICLE_OPTIONS,
+    PARTICLE_SIZE_MIN,
+    PARTICLE_SIZE_MAX,
     PLANET_OPTIONS,
     PLAYER_OPTIONS,
+    PLAYER_LENGTH,
+    RENDER_MAX_HEIGHT,
+    RENDER_MAX_WIDTH,
+    TRAIL_BULLET_SIZE,
+    TRAIL_PARTICLE_SIZE,
     TRAIL_OPTIONS,
 };

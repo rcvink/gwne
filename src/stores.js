@@ -15,7 +15,6 @@ export const player = writable({ position });
 export const cpu = writable({ position });
 export const planet = writable({ position });
 export const bulletSettings = writable({
-    size: 3,
     angleDegrees: 320,
     velocity: 7
 });
