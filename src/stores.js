@@ -1,14 +1,11 @@
 import { writable, derived } from 'svelte/store';
-import Matter from "matter-js";
 
 const position = {
     x: 0,
     y: 0
 };
-export const engine = writable(Matter.Engine.create({ 
-    enableSleeping: true 
-}));
-export const runner = writable(Matter.Runner.create());
+export const engine = writable();
+export const runner = writable();
 export const render = writable();
 export const world = writable();
 export const player = writable({ position });

@@ -2,6 +2,12 @@ import Matter from "matter-js";
 import { CONSTANTS } from './constants'
 import { service } from './service';
 
+const createEngine = () =>
+  Matter.Engine.create({enableSleeping: true});
+
+const createRunner = () =>
+  Matter.Runner.create();
+
 const createPlanet = (renderWidth, renderHeight) => {
   let { x, y, r } = service.getPlanetDimensions(renderWidth, renderHeight);
   let planet = createCircle(x, y, r, CONSTANTS.PLANET_OPTIONS);
@@ -81,6 +87,8 @@ const createVector = (radians) =>
   Matter.Vector.create(Math.cos(radians), Math.sin(radians));
 
 export const factory = {
+  createEngine,
+  createRunner,
   createPlanet,
   createCpu,
   createPlayer,

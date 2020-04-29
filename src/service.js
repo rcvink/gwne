@@ -43,6 +43,9 @@ const gravityOnColliders = (bodyA, bodyB) =>
   }) :
   null;
 
+const setGravityZero = (engine) =>
+  engine.world.gravity.scale = 0;
+
 const getRandomInRange = (min, max) => 
   Math.random() * (max - min) + min;
 
@@ -50,5 +53,6 @@ export const service = {
   getCpuDimensions,
   getPlanetDimensions,
   getPlayerDimensions,
-  gravityOnColliders
+  gravityOnColliders,
+  setGravityZero,
 };

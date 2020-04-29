@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { CONSTANTS } from './constants';
   import { factory } from './factory.js';
+  import { service } from './service.js';
   import { 
     engine,
     runner,
@@ -23,17 +24,23 @@
 
   onMount(() => {
     setupMatter();
+    runMatter();
     startNewLevel();
     registerPermanentListeners();
   });
 
   const setupMatter = () => {
     Matter.use(MatterAttractors);
+    engine.set(factory.createEngine());
     render.set(factory.createRender(document, $engine));
+    runner.set(factory.createRunner());
+    service.setGravityZero($engine);
+    world.set($engine.world);
+  }
+
+  const runMatter = () => {
     Matter.Runner.run($runner, $engine);
     Matter.Render.run($render);
-    $engine.world.gravity.scale = 0;
-    world.set($engine.world);
   }
 
   const startNewLevel = () => {
