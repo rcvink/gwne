@@ -78,7 +78,7 @@ const DENSITIES = {
     particle: 5
 };
 const EXPLOSION_PARTICLE_COUNT = 10;
-const GRAVITATIONAL_CONSTANT = 0.0001;
+const GRAVITATIONAL_CONSTANT = 0.001;
 const PARTICLE_OPTIONS = {
     collisionFilter: COLLISION_FILTERS.particle,
     density: DENSITIES.particle,
