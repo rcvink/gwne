@@ -1,5 +1,9 @@
 NOW IDEAS:
-- Click to fire, angle and velocity calculated based on click location
+- Display last click position
+- Display velocity and angle of last shot
+- Display velocity and angle of current shot (before click) somehow
+- Make suicide possible
+- Do something about lengthy orbits
 
 LATER IDEAS:
 - Variable planet densities
