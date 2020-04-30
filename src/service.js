@@ -12,7 +12,8 @@ const getCpuDimensions = (renderWidth, renderHeight) =>
   });
 
 const getPlanetDimensions = (renderWidth, renderHeight) => {
-  let r = getRandomInRange(60, 
+  let r = getRandomInRange(
+    CONSTANTS.PLANET_RADIUS_MIN, 
     Math.min(renderWidth / 8, renderHeight / 8));
   return {
     x: getRandomInRange(

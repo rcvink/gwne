@@ -98,6 +98,7 @@ const PLANET_OPTIONS = {
     },
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
+const PLANET_RADIUS_MIN = 30;
 const PLAYER_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.player,
@@ -136,6 +137,7 @@ export const CONSTANTS = {
     PARTICLE_OPTIONS,
     PARTICLE_SIZE_MIN,
     PARTICLE_SIZE_MAX,
+    PLANET_RADIUS_MIN,
     PLANET_OPTIONS,
     PLAYER_OPTIONS,
     PLAYER_LENGTH,
