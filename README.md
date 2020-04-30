@@ -1,9 +1,8 @@
 NOW IDEAS:
-- Variable planet densities
-- NPC shots vary velocity randomly
 - Click to fire, angle and velocity calculated based on click location
 
 LATER IDEAS:
+- Variable planet densities
 - Multiple planets, not clashing
 - Worms-style tracking of bullets that are off-screen
 - Trail lifetime for entire shot and shot + 1
