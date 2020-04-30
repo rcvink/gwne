@@ -14,9 +14,6 @@ export const cpu = writable({ position });
 export const planet = writable({ position });
 export const walls = writable([]);
 export const mouseConstraint = writable();
-export const bulletSettings = writable({
-    velocity: CONSTANTS.DEFAULT_VELOCITY
-});
 export const level = writable(0);
 export const mousedownPosition = writable(position);
 export const playerRadians = derived(
@@ -25,6 +22,12 @@ export const playerRadians = derived(
         Math.atan2(
             $mousedownPosition.y - $player.position.y,
             $mousedownPosition.x - $player.position.x));
+export const playerVelocity = derived(
+    [ mousedownPosition, player ],
+    ([ $mousedownPosition, $player ]) =>
+        CONSTANTS.PLAYER_VELOCITY_FACTOR * Math.hypot(
+            $player.position.x - $mousedownPosition.x,
+            $player.position.y - $mousedownPosition.y));
 export const cpuRadians = derived(
     [ player, cpu ],
     ([$player, $cpu]) =>

@@ -11,8 +11,8 @@
     render,
     world, 
     player, 
-    bulletSettings, 
     playerRadians,
+    playerVelocity,
     fireCount,
     cpu,
     cpuRadians,
@@ -122,7 +122,7 @@
       fire(
         $player,
         $playerRadians,
-        $bulletSettings.velocity,
+        $playerVelocity,
         CONSTANTS.COLLISION_FILTERS.bullets.player);
       fireCount.update(n => n + 1);
     });
@@ -217,10 +217,6 @@
 
 </script>
 
-<div>
-  velocity:
-  <input type="number" bind:value={$bulletSettings.velocity} min="1" max="10"/>
-</div>
 <div>
   level: {$level}
 </div>
