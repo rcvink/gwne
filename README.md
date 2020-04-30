@@ -1,3 +1,23 @@
+NOW IDEAS:
+- Add invisible walls to prevent lengthy shots
+- NPC shots vary shots randomly (between parameters)
+- Variable planet densities
+- Bearing instead of angle in UI
+- Click to fire, bearing and angle calculated
+
+LATER IDEAS:
+- Multiple planets, not clashing
+- Worms-style tracking of bullets that are off-screen
+- Trail lifetime for entire shot and shot + 1
+
+MUCH LATER IDEAS:
+- Destructible planets (as a setting)
+- engine/physics on node server, 
+  send updates to client over websockets,
+  render with Matter in client
+
+original svelte readme below
+
 *Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
 ---
