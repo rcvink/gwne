@@ -53,6 +53,15 @@ const createRender = (document, engine) =>
     }
   });
 
+const createMouse = (canvas) =>
+  Matter.Mouse.create(canvas);
+
+const createMouseConstraint = (engine, mouse) => 
+  Matter.MouseConstraint.create(engine, {
+    mouse,
+    constraint: { render: { visible: true } }
+  });
+
 const createBullet = (fromBody, collisionFilter) => {
   let options = CONSTANTS.BULLET_OPTIONS;
   options.collisionFilter = collisionFilter;
@@ -109,6 +118,8 @@ export const factory = {
   createCpu,
   createPlayer,
   createRender,
+  createMouse,
+  createMouseConstraint,
   createBullet,
   createBulletForce,
   createParticles,

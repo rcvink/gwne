@@ -23,12 +23,15 @@
     isPlayerTurn,
     isShotInProgress,
     walls,
-    isShootingDisabled
+    isShootingEnabled,
+    mouseConstraint,
+    mousedownPosition,
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
     runMatter();
+    setupMouse();
     setWalls();
     startNewLevel();
     registerPermanentListeners();
@@ -48,6 +51,12 @@
     Matter.Render.run($render);
   }
 
+  const setupMouse = () => {
+    let mouse = factory.createMouse($render.canvas);
+    mouseConstraint.set(factory.createMouseConstraint($engine, mouse));
+    $render.mouse = mouse;
+  }
+
   const setWalls = () =>
     walls.set(factory.createWalls(
       $render.options.width,
@@ -65,13 +74,19 @@
     cpu.set(factory.createCpu(
       $render.options.width,
       $render.options.height));
-    populateWorld([ $planet, $player, $cpu, ...$walls ]);
+    populateWorld([ 
+      $planet, 
+      $player, 
+      $cpu, 
+      ...$walls, 
+      $mouseConstraint]);
     level.update(n => n + 1);
     fireCount.set(0);
     isPlayerTurn.set(true);
   }
 
   const registerPermanentListeners = () => {
+    playerFireOnClick();
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
     bulletsExplodeOnCollisionWithCategory(
@@ -96,6 +111,21 @@
     removeSleepingOnUpdate(
       [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
   }
+
+  const playerFireOnClick = () =>
+    Matter.Events.on($mouseConstraint, "mousedown", (event) => {
+      if (!$isShootingEnabled) {
+        return;
+      }
+    
+      mousedownPosition.set(event.mouse.mousedownPosition);
+      fire(
+        $player,
+        $playerRadians,
+        $bulletSettings.velocity,
+        CONSTANTS.COLLISION_FILTERS.bullets.player);
+      fireCount.update(n => n + 1);
+    });
 
   const cpuFireOnCpuTurn = () =>
     isPlayerTurn.subscribe(fireIfCpuTurn);
@@ -185,21 +215,8 @@
   const getAllBodies = () =>
     Matter.Composite.allBodies($world);
 
-  const onClick = () => {
-    fire(
-      $player, 
-      $playerRadians, 
-      $bulletSettings.velocity, 
-      CONSTANTS.COLLISION_FILTERS.bullets.player);
-    fireCount.update(n => n + 1);
-  }
-
 </script>
 
-<div>
-  angle:
-  <input type="number" bind:value={$bulletSettings.angleDegrees} min="-90" max="90"/>
-</div>
 <div>
   velocity:
   <input type="number" bind:value={$bulletSettings.velocity} min="1" max="10"/>
@@ -217,15 +234,13 @@
   cpu score: {$cpuScore}
 </div>
 <div>
-  <button on:click={onClick} disabled={$isShootingDisabled}>
-  {#if $isShotInProgress && !$isPlayerTurn}
-    cpu shot in progress...
-  {:else if $isShotInProgress && $isPlayerTurn}
+  {#if $isShootingEnabled}
+    click to fire.
+  {:else if $isPlayerTurn}
     player shot in progress...
-  {:else}
-    fire!
+  {:else if !$isPlayerTurn}
+    cpu shot in progress...
   {/if}
-  </button>
 </div>
 
 <div id="{CONSTANTS.CANVAS_ID}"/>
