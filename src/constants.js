@@ -4,6 +4,23 @@ const DEFAULT_VELOCITY = 4;
 const SLEEP_THRESHOLD_LONG = 1e10;
 const SLEEP_THRESHOLD_SHORT = 120;
 const group = 0;
+const RENDERS = {
+    cpu: {
+        fillStyle: "firebrick"
+    },
+    particle: {
+        fillStyle: "orange",
+    },
+    planet: {
+        fillStyle: "saddlebrown",
+    },
+    player: {
+        fillStyle: "darkslateblue",
+    },
+    trail: {
+        fillStyle: "orange",
+    },
+};
 
 const BULLET_SIZE = 3;
 const CANVAS_ID = "canvas";
@@ -67,9 +84,7 @@ const CPU_BULLET_VELOCITY = DEFAULT_VELOCITY;
 const CPU_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.cpu,
-    render: {
-        fillStyle: "firebrick"
-    },
+    render: RENDERS.cpu,
     sleepThreshold: SLEEP_THRESHOLD_LONG
 };
 const CPU_LENGTH = 20;
@@ -83,9 +98,7 @@ const GRAVITATIONAL_CONSTANT = 0.001;
 const PARTICLE_OPTIONS = {
     collisionFilter: COLLISION_FILTERS.particle,
     density: DENSITIES.particle,
-    render: {
-        fillStyle: "orange",
-    },
+    render: RENDERS.particle,
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
 };
 const PARTICLE_SIZE_MIN = 1;
@@ -93,18 +106,14 @@ const PARTICLE_SIZE_MAX = 4;
 const PLANET_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.planet,
-    render: {
-      fillStyle: "saddlebrown",
-    },
+    render: RENDERS.planet,
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
 const PLANET_RADIUS_MIN = 30;
 const PLAYER_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.player,
-    render: {
-        fillStyle: "darkslateblue",
-    },
+    render: RENDERS.player,
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
 const PLAYER_LENGTH = 20;
@@ -116,9 +125,7 @@ const TRAIL_OPTIONS = {
     isStatic: true,
     isSensor: true,
     collisionFilter: COLLISION_FILTERS.trail,
-    render: {
-        fillStyle: "orange",
-    },
+    render: RENDERS.trail,
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
 };
 
