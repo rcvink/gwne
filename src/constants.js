@@ -4,6 +4,12 @@ const DEFAULT_VELOCITY = 4;
 const SLEEP_THRESHOLD_LONG = 1e10;
 const SLEEP_THRESHOLD_SHORT = 120;
 const group = 0;
+const frictionAir = 0;
+const DENSITIES = {
+    planet: 2,
+    bullet: 5,
+    particle: 5
+};
 const RENDERS = {
     cpu: {
         fillStyle: "firebrick"
@@ -23,6 +29,10 @@ const RENDERS = {
 };
 
 const BULLET_SIZE = 3;
+const BULLET_OPTIONS = {
+    density: DENSITIES.bullet,
+    frictionAir,
+};
 const CANVAS_ID = "canvas";
 const CATEGORIES = {
     player: Matter.Body.nextCategory(),
@@ -96,11 +106,6 @@ const CPU_OPTIONS = {
     sleepThreshold: SLEEP_THRESHOLD_LONG
 };
 const CPU_LENGTH = 20;
-const DENSITIES = {
-    planet: 2,
-    bullet: 5,
-    particle: 5
-};
 const EXPLOSION_PARTICLE_COUNT = 10;
 const GRAVITATIONAL_CONSTANT = 0.001;
 const PARTICLE_OPTIONS = {
@@ -108,6 +113,7 @@ const PARTICLE_OPTIONS = {
     density: DENSITIES.particle,
     render: RENDERS.particle,
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
+    frictionAir
 };
 const PARTICLE_SIZE_MIN = 1;
 const PARTICLE_SIZE_MAX = 4;
@@ -143,7 +149,8 @@ const WALL_OPTIONS = {
 };
 const WALL_THICKNESS = 50;
 
-export const CONSTANTS = { 
+export const CONSTANTS = {
+    BULLET_OPTIONS, 
     BULLET_SIZE,
     CANVAS_ID,
     CATEGORIES,

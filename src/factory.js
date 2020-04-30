@@ -53,15 +53,15 @@ const createRender = (document, engine) =>
     }
   });
 
-const createBullet = (fromBody, collisionFilter) =>
-  createCircle(
+const createBullet = (fromBody, collisionFilter) => {
+  let options = CONSTANTS.BULLET_OPTIONS;
+  options.collisionFilter = collisionFilter;
+  return createCircle(
     fromBody.position.x,
     fromBody.position.y,
     CONSTANTS.BULLET_SIZE,
-    { 
-      collisionFilter, 
-      density: CONSTANTS.DENSITIES.bullet, 
-    });
+    options);
+}
 
 const createBulletForce = (radians, velocity) =>
   Matter.Vector.mult(createVector(radians), velocity);
