@@ -1,5 +1,6 @@
 import Matter from "matter-js";
 
+const DEFAULT_VELOCITY = 4;
 const SLEEP_THRESHOLD_LONG = 1e10;
 const SLEEP_THRESHOLD_SHORT = 120;
 const group = 0;
@@ -62,7 +63,7 @@ const COLLISION_FILTERS = {
         mask: CATEGORIES.trail
     }
 }
-const CPU_BULLET_VELOCITY = 7;
+const CPU_BULLET_VELOCITY = DEFAULT_VELOCITY;
 const CPU_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.cpu,
@@ -128,6 +129,7 @@ export const CONSTANTS = {
     CPU_BULLET_VELOCITY,
     CPU_LENGTH,
     CPU_OPTIONS,
+    DEFAULT_VELOCITY,
     DENSITIES,
     EXPLOSION_PARTICLE_COUNT,
     GRAVITATIONAL_CONSTANT,
