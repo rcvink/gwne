@@ -33,7 +33,8 @@ const CATEGORIES = {
     },
     planet: Matter.Body.nextCategory(),
     particle: Matter.Body.nextCategory(),
-    trail: Matter.Body.nextCategory()
+    trail: Matter.Body.nextCategory(),
+    wall: Matter.Body.nextCategory()
 };
 const COLLISION_FILTERS = {
     player: {
@@ -53,7 +54,8 @@ const COLLISION_FILTERS = {
             mask: CATEGORIES.cpu | 
                 CATEGORIES.planet | 
                 CATEGORIES.bullet.player | 
-                CATEGORIES.bullet.cpu
+                CATEGORIES.bullet.cpu |
+                CATEGORIES.wall
         },
         cpu: {
             group,
@@ -61,7 +63,8 @@ const COLLISION_FILTERS = {
             mask: CATEGORIES.player | 
                 CATEGORIES.planet |
                 CATEGORIES.bullet.player | 
-                CATEGORIES.bullet.cpu
+                CATEGORIES.bullet.cpu |
+                CATEGORIES.wall
         }
     },
     planet: {
@@ -78,6 +81,11 @@ const COLLISION_FILTERS = {
         group,
         category: CATEGORIES.trail,
         mask: CATEGORIES.trail
+    },
+    wall: {
+        group,
+        category: CATEGORIES.wall,
+        mask: CATEGORIES.bullet.player | CATEGORIES.bullet.cpu
     }
 }
 const CPU_BULLET_VELOCITY = DEFAULT_VELOCITY;
@@ -128,6 +136,12 @@ const TRAIL_OPTIONS = {
     render: RENDERS.trail,
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
 };
+const WALL_OPTIONS = {
+    isStatic: true,
+    collisionFilter: COLLISION_FILTERS.wall,
+    sleepThreshold: SLEEP_THRESHOLD_LONG
+};
+const WALL_THICKNESS = 50;
 
 export const CONSTANTS = { 
     BULLET_SIZE,
@@ -153,4 +167,6 @@ export const CONSTANTS = {
     TRAIL_BULLET_SIZE,
     TRAIL_PARTICLE_SIZE,
     TRAIL_OPTIONS,
+    WALL_OPTIONS,
+    WALL_THICKNESS,
 };

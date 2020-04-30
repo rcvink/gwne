@@ -8,6 +8,18 @@ const createEngine = () =>
 const createRunner = () =>
   Matter.Runner.create();
 
+const createWalls = (renderWidth, renderHeight) => {
+  let { top, bottom, left, right } = service
+    .getWallsDimensions(renderWidth, renderHeight);
+
+  return [
+    createRectangle(top, CONSTANTS.WALL_OPTIONS),
+    createRectangle(bottom, CONSTANTS.WALL_OPTIONS),
+    createRectangle(left, CONSTANTS.WALL_OPTIONS),
+    createRectangle(right, CONSTANTS.WALL_OPTIONS),
+  ];
+}
+
 const createPlanet = (renderWidth, renderHeight) => {
   let { x, y, r } = service.getPlanetDimensions(renderWidth, renderHeight);
   let planet = createCircle(x, y, r, CONSTANTS.PLANET_OPTIONS);
@@ -77,6 +89,9 @@ const createTrail = (fromBody, size) =>
     size, 
     CONSTANTS.TRAIL_OPTIONS);
 
+const createRectangle = (dims, options) =>
+  Matter.Bodies.rectangle(dims.x, dims.y, dims.w, dims.h, options);
+
 const createSquare = (x, y, length, options) =>
   Matter.Bodies.rectangle(x, y, length, length, options);
 
@@ -89,6 +104,7 @@ const createVector = (radians) =>
 export const factory = {
   createEngine,
   createRunner,
+  createWalls,
   createPlanet,
   createCpu,
   createPlayer,

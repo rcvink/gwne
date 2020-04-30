@@ -21,12 +21,14 @@
     playerScore,
     cpuScore,
     isPlayerTurn,
-    isShotInProgress
+    isShotInProgress,
+    walls
     } from './stores.js';
 
   onMount(() => {
     setupMatter();
     runMatter();
+    setWalls();
     startNewLevel();
     registerPermanentListeners();
   });
@@ -45,9 +47,14 @@
     Matter.Render.run($render);
   }
 
+  const setWalls = () =>
+    walls.set(factory.createWalls(
+      $render.options.width,
+      $render.options.height
+    ));
+
   const startNewLevel = () => {
-    removeFromWorld(
-      Matter.Composite.allBodies($world));
+    removeFromWorld(getAllBodies());
     planet.set(factory.createPlanet(
       $render.options.width, 
       $render.options.height));
@@ -56,8 +63,8 @@
       $render.options.height));
     cpu.set(factory.createCpu(
       $render.options.width,
-      $render.options.height)); 
-    populateWorld([ $planet, $player, $cpu ]);
+      $render.options.height));
+    populateWorld([ $planet, $player, $cpu, ...$walls ]);
     level.update(n => n + 1);
     fireCount.set(0);
     isPlayerTurn.set(true);
@@ -67,17 +74,17 @@
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
     bulletsExplodeOnCollisionWithCategory(
-      CONSTANTS.CATEGORIES.cpu, 
-      true,
-      false);
+      CONSTANTS.CATEGORIES.cpu,
+      { animate: true, destroyOtherBody: true, updateTurn: false}); 
     bulletsExplodeOnCollisionWithCategory(
-      CONSTANTS.CATEGORIES.player, 
-      true,
-      false);
+      CONSTANTS.CATEGORIES.player,
+      { animate: true, destroyOtherBody: true, updateTurn: false });
     bulletsExplodeOnCollisionWithCategory(
-      CONSTANTS.CATEGORIES.planet, 
-      false,
-      true);
+      CONSTANTS.CATEGORIES.planet,
+      { animate: true, destroyOtherBody: false, updateTurn: true });
+    bulletsExplodeOnCollisionWithCategory(
+      CONSTANTS.CATEGORIES.wall,
+      { animate: false, destroyOtherBody: false, updateTurn: true }); 
     trailOnUpdate([ 
       CONSTANTS.CATEGORIES.bullet.cpu, 
       CONSTANTS.CATEGORIES.bullet.player ],
@@ -90,15 +97,17 @@
   }
 
   const cpuFireOnCpuTurn = () =>
-    isPlayerTurn.subscribe((isNowPlayerTurn) => {
-      if (!isNowPlayerTurn) {
+    isPlayerTurn.subscribe(fireIfCpuTurn);
+
+  const fireIfCpuTurn = (isNowPlayerTurn) => {
+    if (!isNowPlayerTurn) {
         fire(
           $cpu, 
           $cpuRadians, 
           CONSTANTS.CPU_BULLET_VELOCITY, 
           CONSTANTS.COLLISION_FILTERS.bullets.cpu);
-      }
-    });
+    }
+  }
 
   const winOrLoseOnHit = () => 
     Matter.Events.on($engine, "collisionStart", (event) => {
@@ -112,10 +121,7 @@
       } 
     });
 
-  const bulletsExplodeOnCollisionWithCategory = (
-    category, 
-    shouldDestroyNonBullet,
-    shouldUpdateTurn) =>
+  const bulletsExplodeOnCollisionWithCategory = (category, options) =>
     Matter.Events.on($engine, "collisionStart", (event) => {
       let bullet, other;
       let pairs = event.pairs[0];
@@ -131,13 +137,14 @@
       }
 
       isShotInProgress.set(false);
-      populateWorld(factory.createParticles(bullet));
+      if (options.animate) {
+        populateWorld(factory.createParticles(bullet));
+      }
       removeFromWorld(bullet);
-
-      if (shouldDestroyNonBullet) {
+      if (options.destroyOtherBody) {
         removeFromWorld(other);
       }
-      if (shouldUpdateTurn) {
+      if (options.updateTurn) {
         isPlayerTurn.update(n => !n);
       }
     });

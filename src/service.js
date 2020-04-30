@@ -1,6 +1,34 @@
 import Matter from "matter-js";
 import { CONSTANTS } from './constants'
 
+const getWallsDimensions = (renderWidth, renderHeight) => 
+  ({
+    top: {
+      x: renderWidth / 2,
+      y: renderHeight * -1,
+      w: renderWidth * 3,
+      h: CONSTANTS.WALL_THICKNESS
+    },
+    bottom: {
+      x: renderWidth / 2,
+      y: renderHeight * 2,
+      w: renderWidth * 3,
+      h: CONSTANTS.WALL_THICKNESS
+    },
+    left: {
+      x: renderWidth * -1,
+      y: renderHeight / 2,
+      w: CONSTANTS.WALL_THICKNESS,
+      h: renderHeight * 3
+    },
+    right: {
+      x: renderWidth * 2,
+      y: renderHeight / 2,
+      w: CONSTANTS.WALL_THICKNESS,
+      h: renderHeight * 3
+    }
+  });
+
 const getCpuDimensions = (renderWidth, renderHeight) =>
   ({
     x: getRandomInRange(
@@ -55,6 +83,7 @@ const getRandomInRange = (min, max) =>
   Math.random() * (max - min) + min;
 
 export const service = {
+  getWallsDimensions,
   getCpuDimensions,
   getPlanetDimensions,
   getPlayerDimensions,

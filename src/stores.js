@@ -12,6 +12,7 @@ export const world = writable();
 export const player = writable({ position });
 export const cpu = writable({ position });
 export const planet = writable({ position });
+export const walls = writable([]);
 export const bulletSettings = writable({
     angleDegrees: 0,
     velocity: CONSTANTS.DEFAULT_VELOCITY
