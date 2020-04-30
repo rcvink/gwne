@@ -22,7 +22,8 @@
     cpuScore,
     isPlayerTurn,
     isShotInProgress,
-    walls
+    walls,
+    isShootingDisabled
     } from './stores.js';
 
   onMount(() => {
@@ -216,7 +217,7 @@
   cpu score: {$cpuScore}
 </div>
 <div>
-  <button on:click={onClick} disabled={$isShotInProgress || !$isPlayerTurn}>
+  <button on:click={onClick} disabled={$isShootingDisabled}>
   {#if $isShotInProgress && !$isPlayerTurn}
     cpu shot in progress...
   {:else if $isShotInProgress && $isPlayerTurn}

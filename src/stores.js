@@ -32,3 +32,8 @@ export const playerScore = writable(0);
 export const cpuScore = writable(0);
 export const isPlayerTurn = writable(true);
 export const isShotInProgress = writable(false);
+export const isShootingDisabled = derived(
+    [ isShotInProgress, isPlayerTurn ],
+    ([ $isShotInProgress, $isPlayerTurn ]) =>
+        $isShotInProgress || !$isPlayerTurn
+);
