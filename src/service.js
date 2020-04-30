@@ -79,6 +79,11 @@ const gravityOnColliders = (bodyA, bodyB) => {
 const setGravityZero = (engine) =>
   engine.world.gravity.scale = 0;
 
+const randomiseAngle = (directAngle) =>
+  directAngle + getRandomInRange(
+    directAngle * -CONSTANTS.CPU_ANGLE_RANDOMNESS_FACTOR, 
+    directAngle * CONSTANTS.CPU_ANGLE_RANDOMNESS_FACTOR);
+
 const getRandomInRange = (min, max) => 
   Math.random() * (max - min) + min;
 
@@ -89,4 +94,5 @@ export const service = {
   getPlayerDimensions,
   gravityOnColliders,
   setGravityZero,
+  randomiseAngle,
 };

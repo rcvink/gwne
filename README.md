@@ -1,9 +1,7 @@
 NOW IDEAS:
-- Add invisible walls to prevent lengthy shots
-- NPC shots vary shots randomly (between parameters)
 - Variable planet densities
-- Bearing instead of angle in UI
-- Click to fire, bearing and angle calculated
+- NPC shots vary velocity randomly
+- Click to fire, angle and velocity calculated based on click location
 
 LATER IDEAS:
 - Multiple planets, not clashing

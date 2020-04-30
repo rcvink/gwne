@@ -102,11 +102,11 @@
 
   const fireIfCpuTurn = (isNowPlayerTurn) => {
     if (!isNowPlayerTurn) {
-        fire(
-          $cpu, 
-          $cpuRadians, 
-          CONSTANTS.CPU_BULLET_VELOCITY, 
-          CONSTANTS.COLLISION_FILTERS.bullets.cpu);
+      fire(
+        $cpu, 
+        service.randomiseAngle($cpuRadians), 
+        CONSTANTS.CPU_BULLET_VELOCITY, 
+        CONSTANTS.COLLISION_FILTERS.bullets.cpu);
     }
   }
 

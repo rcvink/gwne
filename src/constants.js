@@ -97,7 +97,8 @@ const COLLISION_FILTERS = {
         category: CATEGORIES.wall,
         mask: CATEGORIES.bullet.player | CATEGORIES.bullet.cpu
     }
-}
+};
+const CPU_ANGLE_RANDOMNESS_FACTOR = 0.1;
 const CPU_BULLET_VELOCITY = DEFAULT_VELOCITY;
 const CPU_OPTIONS = {
     isStatic: true,
@@ -155,6 +156,7 @@ export const CONSTANTS = {
     CANVAS_ID,
     CATEGORIES,
     COLLISION_FILTERS,
+    CPU_ANGLE_RANDOMNESS_FACTOR,
     CPU_BULLET_VELOCITY,
     CPU_LENGTH,
     CPU_OPTIONS,
