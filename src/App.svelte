@@ -227,11 +227,5 @@
   {/if}
   </button>
 </div>
-<div>
-  is player turn: {$isPlayerTurn}
-</div>
-<div>
-  is shot in progress: {$isShotInProgress}
-</div>
 
 <div id="{CONSTANTS.CANVAS_ID}"/>
