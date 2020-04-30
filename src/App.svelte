@@ -19,7 +19,9 @@
     level,
     planet,
     playerScore,
-    cpuScore
+    cpuScore,
+    isPlayerTurn,
+    isShotInProgress
     } from './stores.js';
 
   onMount(() => {
@@ -58,20 +60,24 @@
     populateWorld([ $planet, $player, $cpu ]);
     level.update(n => n + 1);
     fireCount.set(0);
+    isPlayerTurn.set(true);
   }
 
   const registerPermanentListeners = () => {
-    cpuFireOnPlayerFire();
+    cpuFireOnCpuTurn();
     winOrLoseOnHit();
     bulletsExplodeOnCollisionWithCategory(
       CONSTANTS.CATEGORIES.cpu, 
-      true);
+      true,
+      false);
     bulletsExplodeOnCollisionWithCategory(
       CONSTANTS.CATEGORIES.player, 
-      true);
+      true,
+      false);
     bulletsExplodeOnCollisionWithCategory(
       CONSTANTS.CATEGORIES.planet, 
-      false);
+      false,
+      true);
     trailOnUpdate([ 
       CONSTANTS.CATEGORIES.bullet.cpu, 
       CONSTANTS.CATEGORIES.bullet.player ],
@@ -83,9 +89,9 @@
       [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
   }
 
-  const cpuFireOnPlayerFire = () =>
-    fireCount.subscribe((newValue) => {
-      if (newValue > 0) {
+  const cpuFireOnCpuTurn = () =>
+    isPlayerTurn.subscribe((isNowPlayerTurn) => {
+      if (!isNowPlayerTurn) {
         fire(
           $cpu, 
           $cpuRadians, 
@@ -108,7 +114,8 @@
 
   const bulletsExplodeOnCollisionWithCategory = (
     category, 
-    shouldDestroyNonBullet) =>
+    shouldDestroyNonBullet,
+    shouldUpdateTurn) =>
     Matter.Events.on($engine, "collisionStart", (event) => {
       let bullet, other;
       let pairs = event.pairs[0];
@@ -123,36 +130,38 @@
         return null;
       }
 
-      let particles = factory.createParticles(bullet);
-      populateWorld(particles);
+      isShotInProgress.set(false);
+      populateWorld(factory.createParticles(bullet));
       removeFromWorld(bullet);
 
       if (shouldDestroyNonBullet) {
         removeFromWorld(other);
       }
+      if (shouldUpdateTurn) {
+        isPlayerTurn.update(n => !n);
+      }
     });
 
   const trailOnUpdate = (categoriesToTrail, trailSize) =>
     Matter.Events.on($engine, "afterUpdate", (event) => 
-      Matter.Composite
-        .allBodies($world)
+      getAllBodies()
         .filter(body => categoriesToTrail.includes(body.collisionFilter.category))
         .forEach(bodyToTrail => populateWorld(factory.createTrail(bodyToTrail, trailSize))));
 
   const removeSleepingOnUpdate = (categoriesToRemove) => 
     Matter.Events.on($engine, "afterUpdate", (event) =>
-      Matter.Composite
-        .allBodies($world)
+      getAllBodies()
         .filter(body => body.isSleeping)
         .filter(sleepingBody => categoriesToRemove.includes(sleepingBody.collisionFilter.category))
-        .forEach(bodyToRemove => removeFromWorld(bodyToRemove)));
+        .forEach(removeFromWorld));
 
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
   const fire = (fromBody, rads, velocity, collisionFilter) => {
+    isShotInProgress.set(true);
     let bullet = factory.createBullet(
-      fromBody, 
+      fromBody,
       collisionFilter);
 
     populateWorld(bullet);
@@ -164,6 +173,9 @@
 
   const removeFromWorld = (objectsToRemove) =>
     Matter.World.remove($world, objectsToRemove);
+
+  const getAllBodies = () =>
+    Matter.Composite.allBodies($world);
 
   const onClick = () => {
     fire(
@@ -178,7 +190,7 @@
 
 <div>
   angle:
-  <input type="number" bind:value={$bulletSettings.angleDegrees} min="0" max="359"/>
+  <input type="number" bind:value={$bulletSettings.angleDegrees} min="-90" max="90"/>
 </div>
 <div>
   velocity:
@@ -196,5 +208,22 @@
 <div>
   cpu score: {$cpuScore}
 </div>
+<div>
+  <button on:click={onClick} disabled={$isShotInProgress || !$isPlayerTurn}>
+  {#if $isShotInProgress && !$isPlayerTurn}
+    cpu shot in progress...
+  {:else if $isShotInProgress && $isPlayerTurn}
+    player shot in progress...
+  {:else}
+    fire!
+  {/if}
+  </button>
+</div>
+<div>
+  is player turn: {$isPlayerTurn}
+</div>
+<div>
+  is shot in progress: {$isShotInProgress}
+</div>
 
-<div id="{CONSTANTS.CANVAS_ID}" on:click={onClick} />
+<div id="{CONSTANTS.CANVAS_ID}"/>
