@@ -1,4 +1,5 @@
 import Matter from "matter-js";
+import Render from "./Render";
 import { CONSTANTS } from './constants'
 import { service } from './service';
 
@@ -39,7 +40,7 @@ const createCpu = (renderWidth, renderHeight) => {
 }
 
 const createRender = (document, engine) =>
-  Matter.Render.create({
+  Render.create({
     element: document.getElementById(CONSTANTS.CANVAS_ID),
     engine: engine,
     options: {
@@ -49,7 +50,6 @@ const createRender = (document, engine) =>
       height: Math.min(
         document.documentElement.clientHeight, 
         CONSTANTS.RENDER_MAX_HEIGHT),
-      wireframes: false
     }
   });
 
