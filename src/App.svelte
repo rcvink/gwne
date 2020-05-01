@@ -1,6 +1,7 @@
 <script>
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
+  import Render from "./Render";
   import { onMount } from "svelte";
   import { CONSTANTS } from './constants';
   import { factory } from './factory.js';
@@ -53,7 +54,7 @@
 
   const runMatter = () => {
     Matter.Runner.run($runner, $engine);
-    Matter.Render.run($render);
+    Render.run($render);
   }
 
   const setupMouse = () => {
@@ -76,6 +77,7 @@
     player.set(factory.createPlayer(
       $render.options.width,
       $render.options.height));
+    $render.playerPosition = $player.position;
     cpu.set(factory.createCpu(
       $render.options.width,
       $render.options.height));
