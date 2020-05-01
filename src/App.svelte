@@ -12,7 +12,9 @@
     world, 
     player, 
     playerRadians,
+    lastPlayerDegrees,
     playerVelocity,
+    lastPlayerVelocity,
     fireCount,
     cpu,
     cpuRadians,
@@ -221,17 +223,20 @@
   level: {$level}
 </div>
 <div>
-  shots fired: {$fireCount}
-</div>
-<div>
   player score: {$playerScore}
 </div>
 <div>
   cpu score: {$cpuScore}
 </div>
 <div>
+  last velocity: {$lastPlayerVelocity || "N/A"}
+</div>
+<div>
+  last angle: {$lastPlayerDegrees || "N/A"}
+</div>
+<div>
   {#if $isShootingEnabled}
-    click to fire.
+    <b>click to fire.</b>
   {:else if $isPlayerTurn}
     player shot in progress...
   {:else if !$isPlayerTurn}

@@ -16,29 +16,38 @@ export const walls = writable([]);
 export const mouseConstraint = writable();
 export const level = writable(0);
 export const mousedownPosition = writable(position);
+export const fireCount = writable(0);
+export const playerScore = writable(0);
+export const cpuScore = writable(0);
+export const isPlayerTurn = writable(true);
+export const isShotInProgress = writable(false);
+
 export const playerRadians = derived(
     [ mousedownPosition, player ],
     ([ $mousedownPosition, $player ]) =>
         Math.atan2(
             $mousedownPosition.y - $player.position.y,
             $mousedownPosition.x - $player.position.x));
+export const lastPlayerDegrees = derived(
+    [ fireCount, playerRadians ], 
+    ([ $fireCount, $playerRadians ]) => 
+        $fireCount > 0 ? Math.round($playerRadians * 180 / Math.PI) + "°" : null);
 export const playerVelocity = derived(
     [ mousedownPosition, player ],
     ([ $mousedownPosition, $player ]) =>
         CONSTANTS.PLAYER_VELOCITY_FACTOR * Math.hypot(
             $player.position.x - $mousedownPosition.x,
             $player.position.y - $mousedownPosition.y));
+export const lastPlayerVelocity = derived(
+    [ fireCount, playerVelocity ],
+    ([ $fireCount, $playerVelocity ]) =>
+        $fireCount > 0 ? $playerVelocity.toFixed(1) : null);
 export const cpuRadians = derived(
     [ player, cpu ],
     ([$player, $cpu]) =>
         Math.atan2(
             $player.position.y - $cpu.position.y, 
             $player.position.x - $cpu.position.x));
-export const fireCount = writable(0);
-export const playerScore = writable(0);
-export const cpuScore = writable(0);
-export const isPlayerTurn = writable(true);
-export const isShotInProgress = writable(false);
 export const isShootingEnabled = derived(
     [ isPlayerTurn, isShotInProgress ],
     ([ $isPlayerTurn, $isShotInProgress ]) =>
