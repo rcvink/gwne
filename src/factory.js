@@ -50,6 +50,7 @@ const createRender = (document, engine) =>
       height: Math.min(
         document.documentElement.clientHeight, 
         CONSTANTS.RENDER_MAX_HEIGHT),
+      showShotIndicator: true
     }
   });
 

@@ -73,7 +73,9 @@ const Mouse = Matter.Mouse;
                 showVertexNumbers: false,
                 showConvexHulls: false,
                 showInternalEdges: false,
-                showMousePosition: false
+                showMousePosition: false,
+                showShotIndicator: false,
+                playerPosition: null
             }
         };
 
@@ -89,6 +91,7 @@ const Mouse = Matter.Mouse;
         render.canvas = render.canvas || _createCanvas(render.options.width, render.options.height);
         render.context = render.canvas.getContext('2d');
         render.textures = {};
+        render.playerPosition = options.playerPosition;
 
         render.bounds = render.bounds || { 
             min: { 
@@ -397,6 +400,10 @@ const Mouse = Matter.Mouse;
 
         if (options.showMousePosition)
             Render.mousePosition(render, render.mouse, context);
+
+        if (options.showShotIndicator) {
+            Render.shotIndicator(render, render.mouse, context);
+        }
 
         Render.constraints(constraints, context);
 
@@ -803,6 +810,28 @@ const Mouse = Matter.Mouse;
         var c = context;
         c.fillStyle = 'rgba(255,255,255,0.8)';
         c.fillText(mouse.position.x + '  ' + mouse.position.y, mouse.position.x + 5, mouse.position.y - 5);
+    };
+
+    /**
+     * Renders shot indicator.
+     * @private
+     * @method shotIndicator
+     * @param {render} render
+     * @param {mouse} mouse
+     * @param {RenderingContext} context
+     */
+    Render.shotIndicator = function(render, mouse, context) {
+        if (!mouse || !render.playerPosition) {
+            return;
+        }
+        let c = context;
+        c.beginPath();
+        c.moveTo(render.playerPosition.x, render.playerPosition.y);
+        c.lineTo(mouse.position.x, mouse.position.y);
+        c.strokeStyle = 'gray';
+        c.lineWidth = 1;
+        c.setLineDash([10, 10]);
+        c.stroke();
     };
 
     /**
