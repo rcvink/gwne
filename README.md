@@ -1,5 +1,4 @@
 NOW IDEAS:
-- CPU varies velocity
 - CPU improves shots
 - Render angle and power as user is aiming
 
@@ -17,7 +16,7 @@ MUCH LATER IDEAS:
 - Destructible planets (as a setting)
 - engine/physics on node server, 
   send updates to client over websockets,
-  render with Matter in client
+  render in client
 
 original svelte readme below
 

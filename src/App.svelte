@@ -149,8 +149,8 @@
     fire({
       fromBody: $cpu,
       offset: CONSTANTS.CPU_LENGTH,
-      rads: service.randomiseAngle($cpuRadians),
-      velocity: CONSTANTS.CPU_BULLET_VELOCITY,
+      rads: service.randomise($cpuRadians, CONSTANTS.CPU_ANGLE_RANDOMNESS_FACTOR),
+      velocity: service.getRandomInRange(CONSTANTS.CPU_VELOCITY_MIN, CONSTANTS.CPU_VELOCITY_MAX),
       collisionFilter: CONSTANTS.COLLISION_FILTERS.bullets.cpu
     });
   }
