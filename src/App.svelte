@@ -11,6 +11,8 @@
     render,
     world, 
     player, 
+    currentPlayerDegrees,
+    currentPlayerVelocity,
     playerRadians,
     lastPlayerDegrees,
     playerVelocity,
@@ -28,6 +30,7 @@
     isShootingEnabled,
     mouseConstraint,
     mousedownPosition,
+    mouse
     } from './stores.js';
 
   onMount(() => {
@@ -54,9 +57,9 @@
   }
 
   const setupMouse = () => {
-    let mouse = factory.createMouse($render.canvas);
-    mouseConstraint.set(factory.createMouseConstraint($engine, mouse));
-    $render.mouse = mouse;
+    mouse.set(factory.createMouse($render.canvas));
+    mouseConstraint.set(factory.createMouseConstraint($engine, $mouse));
+    $render.mouse = $mouse;
   }
 
   const setWalls = () =>
@@ -88,6 +91,7 @@
   }
 
   const registerPermanentListeners = () => {
+    trackMousePosition();
     playerFireOnClick();
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
@@ -113,6 +117,9 @@
     removeSleepingOnUpdate(
       [ CONSTANTS.CATEGORIES.particle, CONSTANTS.CATEGORIES.trail ]);
   }
+
+  const trackMousePosition = () =>
+    Matter.Events.on($engine, "afterUpdate", () => mouse.set($mouse));
 
   const playerFireOnClick = () =>
     Matter.Events.on($mouseConstraint, "mousedown", (event) => {
@@ -234,6 +241,12 @@
 </div>
 <div>
   last angle: {$lastPlayerDegrees || "N/A"}
+</div>
+<div>
+  current angle: {$currentPlayerDegrees}°
+</div>
+<div>
+  current velocity: {$currentPlayerVelocity}  
 </div>
 <div>
   {#if $isShootingEnabled}
