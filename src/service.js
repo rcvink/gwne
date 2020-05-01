@@ -65,15 +65,15 @@ const getPlayerDimensions = (renderWidth, renderHeight) =>
   });
 
 const gravityOnColliders = (bodyA, bodyB) => {
-  if (Matter.Detector.canCollide(bodyA.collisionFilter, bodyB.collisionFilter)) {
-    let bToA = Matter.Vector.sub(bodyB.position, bodyA.position),
-      distanceSq = Matter.Vector.magnitudeSquared(bToA) || 0.0001,
-      normal = Matter.Vector.normalise(bToA),
-      magnitude = -CONSTANTS.GRAVITATIONAL_CONSTANT * (bodyA.mass * bodyB.mass / distanceSq);
-    return Matter.Vector.mult(normal, magnitude);
-  } else {
+  if (!Matter.Detector.canCollide(bodyA.collisionFilter, bodyB.collisionFilter)) {
     return null;
   }
+  let bToA = Matter.Vector.sub(bodyB.position, bodyA.position);
+  let distanceSq = Matter.Vector.magnitudeSquared(bToA) || 0.0001; 
+  let normal = Matter.Vector.normalise(bToA)
+  let magnitude = -CONSTANTS.GRAVITATIONAL_CONSTANT * 
+    (bodyA.mass * bodyB.mass / distanceSq);
+  return Matter.Vector.mult(normal, magnitude);
 }
 
 const setGravityZero = (engine) =>
