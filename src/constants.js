@@ -54,18 +54,19 @@ const COLLISION_FILTERS = {
     player: {
         group,
         category: CATEGORIES.player,
-        mask: CATEGORIES.bullet.cpu 
+        mask: CATEGORIES.bullet.cpu | CATEGORIES.bullet.player
     },
     cpu: {
         group,
         category: CATEGORIES.cpu,
-        mask: CATEGORIES.bullet.player
+        mask: CATEGORIES.bullet.player | CATEGORIES.bullet.cpu
     },
     bullets: {
         player: {
             group,
             category: CATEGORIES.bullet.player,
             mask: CATEGORIES.cpu | 
+                CATEGORIES.player |
                 CATEGORIES.planet | 
                 CATEGORIES.bullet.player | 
                 CATEGORIES.bullet.cpu |
@@ -74,7 +75,8 @@ const COLLISION_FILTERS = {
         cpu: {
             group,
             category: CATEGORIES.bullet.cpu,
-            mask: CATEGORIES.player | 
+            mask: CATEGORIES.player |
+                CATEGORIES.cpu | 
                 CATEGORIES.planet |
                 CATEGORIES.bullet.player | 
                 CATEGORIES.bullet.cpu |

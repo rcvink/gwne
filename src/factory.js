@@ -62,12 +62,14 @@ const createMouseConstraint = (engine, mouse) =>
     constraint: { render: { visible: true } }
   });
 
-const createBullet = (fromBody, collisionFilter) => {
+const createBullet = (fromBody, offset, rads, collisionFilter) => {
+  let translateBy = Matter.Vector.mult(createVector(rads), offset);
+  let position = Matter.Vector.add(fromBody.position, translateBy);
   let options = CONSTANTS.BULLET_OPTIONS;
   options.collisionFilter = collisionFilter;
   return createCircle(
-    fromBody.position.x,
-    fromBody.position.y,
+    position.x,
+    position.y,
     CONSTANTS.BULLET_SIZE,
     options);
 }

@@ -128,11 +128,13 @@
       }
     
       mousedownPosition.set(event.mouse.mousedownPosition);
-      fire(
-        $player,
-        $playerRadians,
-        $playerVelocity,
-        CONSTANTS.COLLISION_FILTERS.bullets.player);
+      fire({
+        fromBody: $player,
+        offset: CONSTANTS.PLAYER_LENGTH,
+        rads: $playerRadians,
+        velocity: $playerVelocity,
+        collisionFilter: CONSTANTS.COLLISION_FILTERS.bullets.player
+      });
       fireCount.update(n => n + 1);
       populateWorld(factory.createLastShotIndicator($mousedownPosition));
     });
@@ -141,13 +143,16 @@
     isPlayerTurn.subscribe(fireIfCpuTurn);
 
   const fireIfCpuTurn = (isNowPlayerTurn) => {
-    if (!isNowPlayerTurn) {
-      fire(
-        $cpu, 
-        service.randomiseAngle($cpuRadians), 
-        CONSTANTS.CPU_BULLET_VELOCITY, 
-        CONSTANTS.COLLISION_FILTERS.bullets.cpu);
+    if (isNowPlayerTurn) {
+      return;
     }
+    fire({
+      fromBody: $cpu,
+      offset: CONSTANTS.CPU_LENGTH,
+      rads: service.randomiseAngle($cpuRadians),
+      velocity: CONSTANTS.CPU_BULLET_VELOCITY,
+      collisionFilter: CONSTANTS.COLLISION_FILTERS.bullets.cpu
+    });
   }
 
   const winOrLoseOnHit = () => 
@@ -206,17 +211,19 @@
   const populateWorld = (objectsToAdd) =>
     Matter.World.add($world, objectsToAdd);
 
-  const fire = (fromBody, rads, velocity, collisionFilter) => {
+  const fire = (options) => {
     isShotInProgress.set(true);
     let bullet = factory.createBullet(
-      fromBody,
-      collisionFilter);
+      options.fromBody,
+      options.offset,
+      options.rads,
+      options.collisionFilter);
 
     populateWorld(bullet);
     Matter.Body.applyForce(
       bullet,
       bullet.position,
-      factory.createBulletForce(rads, velocity));
+      factory.createBulletForce(options.rads, options.velocity));
   }
 
   const removeFromWorld = (objectsToRemove) =>

@@ -1,8 +1,10 @@
 NOW IDEAS:
-- End shot button
-- Display velocity and angle of current shot (before click) somehow
-- Make suicide possible (without suiciding immediately on fire)
-- Do something about lengthy orbits
+- CPU varies velocity
+- CPU improves shots
+- Render angle and power as user is aiming
+
+MAYBE:
+- velocity based on length of mousedown? 
 
 LATER IDEAS:
 - Variable planet densities
@@ -11,6 +13,7 @@ LATER IDEAS:
 - Trail lifetime for entire shot and shot + 1
 
 MUCH LATER IDEAS:
+- Ammo types
 - Destructible planets (as a setting)
 - engine/physics on node server, 
   send updates to client over websockets,
