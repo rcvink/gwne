@@ -98,6 +98,13 @@ const createTrail = (fromBody, size) =>
     size, 
     CONSTANTS.TRAIL_OPTIONS);
 
+const createLastShotIndicator = (position) =>
+  createCircle(
+    position.x,
+    position.y,
+    CONSTANTS.LAST_SHOT_INDICATOR_SIZE,
+    CONSTANTS.LAST_SHOT_INDICATOR_OPTIONS);
+
 const createRectangle = (dims, options) =>
   Matter.Bodies.rectangle(dims.x, dims.y, dims.w, dims.h, options);
 
@@ -123,5 +130,6 @@ export const factory = {
   createBullet,
   createBulletForce,
   createParticles,
-  createTrail
+  createTrail,
+  createLastShotIndicator,
 };

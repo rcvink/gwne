@@ -127,6 +127,7 @@
         $playerVelocity,
         CONSTANTS.COLLISION_FILTERS.bullets.player);
       fireCount.update(n => n + 1);
+      populateWorld(factory.createLastShotIndicator($mousedownPosition));
     });
 
   const cpuFireOnCpuTurn = () =>

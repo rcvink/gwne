@@ -1,8 +1,7 @@
 NOW IDEAS:
-- Display last click position
-- Display velocity and angle of last shot
+- End shot button
 - Display velocity and angle of current shot (before click) somehow
-- Make suicide possible
+- Make suicide possible (without suiciding immediately on fire)
 - Do something about lengthy orbits
 
 LATER IDEAS:

@@ -26,6 +26,9 @@ const RENDERS = {
     trail: {
         fillStyle: "orange",
     },
+    lastShotIndicator: {
+        fillStyle: "gainsboro"
+    }
 };
 
 const BULLET_SIZE = 3;
@@ -44,7 +47,8 @@ const CATEGORIES = {
     planet: Matter.Body.nextCategory(),
     particle: Matter.Body.nextCategory(),
     trail: Matter.Body.nextCategory(),
-    wall: Matter.Body.nextCategory()
+    wall: Matter.Body.nextCategory(),
+    lastShotIndicator: Matter.Body.nextCategory(),
 };
 const COLLISION_FILTERS = {
     player: {
@@ -96,6 +100,10 @@ const COLLISION_FILTERS = {
         group,
         category: CATEGORIES.wall,
         mask: CATEGORIES.bullet.player | CATEGORIES.bullet.cpu
+    },
+    lastShotIndicator: {
+        group,
+        category: CATEGORIES.lastShotIndicator
     }
 };
 const CPU_ANGLE_RANDOMNESS_FACTOR = 0.1;
@@ -109,6 +117,13 @@ const CPU_OPTIONS = {
 const CPU_LENGTH = 20;
 const EXPLOSION_PARTICLE_COUNT = 10;
 const GRAVITATIONAL_CONSTANT = 0.001;
+const LAST_SHOT_INDICATOR_OPTIONS = {
+    isStatic: true,
+    collisionFilter: COLLISION_FILTERS.lastShotIndicator,
+    render: RENDERS.lastShotIndicator,
+    sleepThreshold: SLEEP_THRESHOLD_LONG,
+}
+const LAST_SHOT_INDICATOR_SIZE = 2;
 const PARTICLE_OPTIONS = {
     collisionFilter: COLLISION_FILTERS.particle,
     density: DENSITIES.particle,
@@ -165,6 +180,8 @@ export const CONSTANTS = {
     DENSITIES,
     EXPLOSION_PARTICLE_COUNT,
     GRAVITATIONAL_CONSTANT,
+    LAST_SHOT_INDICATOR_OPTIONS,
+    LAST_SHOT_INDICATOR_SIZE,
     PARTICLE_OPTIONS,
     PARTICLE_SIZE_MIN,
     PARTICLE_SIZE_MAX,
