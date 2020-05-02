@@ -4,12 +4,14 @@
   import { onMount } from "svelte";
 
   import BodyFactory from './factories/BodyFactory';
+  import Categories from './constants/Categories';
+  import CollisionFilters from './constants/CollisionFilters';
   import Constants from './Constants';
   import Dimensions from './constants/Dimensions';
   import GameFactory from './factories/GameFactory';
-  import Render from './Render';
   import GravityService from './services/GravityService';
   import RandomService from './services/RandomService';
+  import Render from './Render';
   import VectorService from './services/VectorService';
 
   import {
@@ -109,26 +111,26 @@
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
     bulletsExplodeOnCollisionWithCategory(
-      Constants.CATEGORIES.cpu,
+      Categories.CPU,
       { animate: true, destroyOtherBody: true, updateTurn: false}); 
     bulletsExplodeOnCollisionWithCategory(
-      Constants.CATEGORIES.player,
+      Categories.PLAYER,
       { animate: true, destroyOtherBody: true, updateTurn: false });
     bulletsExplodeOnCollisionWithCategory(
-      Constants.CATEGORIES.planet,
+      Categories.PLANET,
       { animate: true, destroyOtherBody: false, updateTurn: true });
     bulletsExplodeOnCollisionWithCategory(
-      Constants.CATEGORIES.wall,
+      Categories.WALL,
       { animate: false, destroyOtherBody: false, updateTurn: true }); 
     trailOnUpdate([ 
-      Constants.CATEGORIES.bullet.cpu, 
-      Constants.CATEGORIES.bullet.player ],
+      Categories.BULLET.CPU, 
+      Categories.BULLET.PLAYER ],
       Dimensions.TRAIL_BULLET_SIZE);
     trailOnUpdate(
-      [ Constants.CATEGORIES.particle ],
+      [ Categories.PARTICLE ],
       Dimensions.TRAIL_PARTICLE_SIZE);
     removeSleepingOnUpdate(
-      [ Constants.CATEGORIES.particle, Constants.CATEGORIES.trail ]);
+      [ Categories.PARTICLE, Categories.TRAIL ]);
   }
 
   const trackMousePosition = () =>
@@ -152,7 +154,7 @@
         offset: Dimensions.PLAYER_LENGTH,
         rads: $playerRadians,
         velocity: $playerVelocity,
-        collisionFilter: Constants.COLLISION_FILTERS.bullets.player
+        collisionFilter: CollisionFilters.BULLETS.PLAYER,
       });
       fireCount.update(n => n + 1);
       populateWorld(BodyFactory.createLastShotIndicator($mousedownPosition));
@@ -170,7 +172,7 @@
       offset: Dimensions.CPU_LENGTH,
       rads: RandomService.randomise($cpuRadians, Dimensions.CPU_ANGLE_RANDOMNESS_FACTOR),
       velocity: RandomService.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
-      collisionFilter: Constants.COLLISION_FILTERS.bullets.cpu
+      collisionFilter: CollisionFilters.BULLETS.CPU,
     });
   }
 

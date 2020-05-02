@@ -1,4 +1,3 @@
-import Constants from '../Constants';
 import Dimensions from '../constants/Dimensions';
 import RandomService from './RandomService'
 
