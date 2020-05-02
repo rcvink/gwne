@@ -93,6 +93,7 @@
   }
 
   const registerPermanentListeners = () => {
+    trackCurrentPlayerVelocity();
     trackMousePosition();
     playerFireOnClick();
     cpuFireOnCpuTurn();
@@ -122,6 +123,9 @@
 
   const trackMousePosition = () =>
     Matter.Events.on($engine, "afterUpdate", () => mouse.set($mouse));
+    
+  const trackCurrentPlayerVelocity = () =>
+    currentPlayerVelocity.subscribe(n => $render.shotIndicatorVelocity = n);
 
   const playerFireOnClick = () =>
     Matter.Events.on($mouseConstraint, "mousedown", (event) => {
@@ -253,9 +257,6 @@
 </div>
 <div>
   current angle: {$currentPlayerDegrees}°
-</div>
-<div>
-  current velocity: {$currentPlayerVelocity}  
 </div>
 <div>
   {#if $isShootingEnabled}

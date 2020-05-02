@@ -75,7 +75,8 @@ const Mouse = Matter.Mouse;
                 showInternalEdges: false,
                 showMousePosition: false,
                 showShotIndicator: false,
-                playerPosition: null
+                playerPosition: null,
+                shotIndicatorVelocity: 0
             }
         };
 
@@ -92,6 +93,7 @@ const Mouse = Matter.Mouse;
         render.context = render.canvas.getContext('2d');
         render.textures = {};
         render.playerPosition = options.playerPosition;
+        render.shotIndicatorVelocity = options.shotIndicatorVelocity;
 
         render.bounds = render.bounds || { 
             min: { 
@@ -825,11 +827,15 @@ const Mouse = Matter.Mouse;
             return;
         }
         let c = context;
-        c.beginPath();
-        c.moveTo(render.playerPosition.x, render.playerPosition.y);
-        c.lineTo(mouse.position.x, mouse.position.y);
         c.strokeStyle = 'gray';
-        c.lineWidth = 1;
+        c.fillStyle = '#C0C0C0';
+        c.font = "14px Segoe UI";
+        c.lineWidth = 2;
+        c.beginPath();
+        c.moveTo(mouse.position.x, mouse.position.y);
+        c.fillText(`v: ${render.shotIndicatorVelocity}`, mouse.position.x + 15, mouse.position.y + 10);
+        c.lineTo(render.playerPosition.x, render.playerPosition.y);
+        c.lineTo(render.playerPosition.x + render.canvas.width / 6, render.playerPosition.y);
         c.setLineDash([10, 10]);
         c.stroke();
     };
