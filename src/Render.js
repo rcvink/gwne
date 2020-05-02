@@ -851,6 +851,9 @@ const Mouse = Matter.Mouse;
         c.lineTo(playerX, playerY);
         c.fillText(`a: ${render.shotIndicatorDegrees}°`, angleTextX, angleTextY);
         c.lineTo(playerX + radius + 30, playerY);
+        c.stroke();
+
+        c.beginPath();
         c.arc(playerX, playerY, radius, 0, render.shotIndicatorDegrees * Math.PI / 180, render.shotIndicatorDegrees < 0);
         c.stroke();
 
