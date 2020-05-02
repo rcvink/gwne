@@ -6,7 +6,7 @@
   import Factory from './Factory';
   import Render from "./Render";
   import GravityService from './services/GravityService';
-  import Service from './Service';
+  import RandomService from './services/RandomService';
   import {
     engine,
     runner,
@@ -162,8 +162,8 @@
     fire({
       fromBody: $cpu,
       offset: Constants.CPU_LENGTH,
-      rads: Service.randomise($cpuRadians, Constants.CPU_ANGLE_RANDOMNESS_FACTOR),
-      velocity: Service.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
+      rads: RandomService.randomise($cpuRadians, Constants.CPU_ANGLE_RANDOMNESS_FACTOR),
+      velocity: RandomService.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
       collisionFilter: Constants.COLLISION_FILTERS.bullets.cpu
     });
   }
