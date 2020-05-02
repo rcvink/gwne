@@ -2,13 +2,15 @@
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
+
   import BodyFactory from './factories/BodyFactory';
   import Constants from './Constants';
-  import Factory from './Factory';
-  import Render from "./Render";
+  import GameFactory from './factories/GameFactory';
+  import Render from './Render';
   import GravityService from './services/GravityService';
   import RandomService from './services/RandomService';
   import VectorService from './services/VectorService';
+
   import {
     engine,
     runner,
@@ -28,6 +30,7 @@
     mousedownPosition,
     mouse
   } from './stores/writable';
+  
   import {
     currentPlayerDegrees,
     currentPlayerVelocity,
@@ -50,9 +53,9 @@
 
   const setupMatter = () => {
     Matter.use(MatterAttractors);
-    engine.set(Factory.createEngine());
-    render.set(Factory.createRender(document, $engine));
-    runner.set(Factory.createRunner());
+    engine.set(GameFactory.createEngine());
+    render.set(GameFactory.createRender(document, $engine));
+    runner.set(GameFactory.createRunner());
     GravityService.setGravityZero($engine);
     world.set($engine.world);
   }
@@ -63,8 +66,8 @@
   }
 
   const setupMouse = () => {
-    mouse.set(Factory.createMouse($render.canvas));
-    mouseConstraint.set(Factory.createMouseConstraint($engine, $mouse));
+    mouse.set(GameFactory.createMouse($render.canvas));
+    mouseConstraint.set(GameFactory.createMouseConstraint($engine, $mouse));
     $render.mouse = $mouse;
   }
 

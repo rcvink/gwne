@@ -1,6 +1,6 @@
 import Matter from "matter-js";
-import Render from "./Render";
-import Constants from './Constants'
+import Render from "../Render";
+import Constants from '../Constants'
 
 const createEngine = () =>
   Matter.Engine.create({enableSleeping: true});
