@@ -829,18 +829,32 @@ const Mouse = Matter.Mouse;
             return;
         }
         let c = context;
+        let mouseX = mouse.position.x;
+        let mouseY = mouse.position.y;
+        let playerX = render.playerPosition.x;
+        let playerY = render.playerPosition.y;
+        let radius = render.canvas.width / 12;
+        let angleTextX = playerX + radius + 30;
+        let angleTextY = playerY + 15;
+
         c.strokeStyle = 'gray';
         c.fillStyle = '#C0C0C0';
-        c.font = "14px Segoe UI";
-        c.lineWidth = 2;
+        c.font = '14px Segoe UI';
+        c.lineWidth = 1;
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+        c.globalAlpha = 0.8;
+        
         c.beginPath();
-        c.moveTo(mouse.position.x, mouse.position.y);
-        c.fillText(`v: ${render.shotIndicatorVelocity}`, mouse.position.x + 15, mouse.position.y + 10);
-        c.lineTo(render.playerPosition.x, render.playerPosition.y);
-        c.fillText(`a: ${render.shotIndicatorDegrees}°`, render.playerPosition.x + 15, render.playerPosition.y + 15);
-        c.lineTo(render.playerPosition.x + render.canvas.width / 12, render.playerPosition.y);
-        c.setLineDash([10, 10]);
+        c.moveTo(mouseX, mouseY);
+        c.fillText(`v: ${render.shotIndicatorVelocity}`, mouseX + 15, mouseY + 10);
+        c.lineTo(playerX, playerY);
+        c.fillText(`a: ${render.shotIndicatorDegrees}°`, angleTextX, angleTextY);
+        c.lineTo(playerX + radius + 30, playerY);
+        c.arc(playerX, playerY, radius, 0, render.shotIndicatorDegrees * Math.PI / 180, render.shotIndicatorDegrees < 0);
         c.stroke();
+
+        c.globalAlpha = 1;
     };
 
     /**
