@@ -1,26 +1,19 @@
 <script>
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
-  import Render from "./Render";
   import { onMount } from "svelte";
   import Constants from './Constants';
   import Factory from './Factory';
+  import Render from "./Render";
   import Service from './Service';
-  import { 
+  import {
     engine,
     runner,
     render,
-    world, 
-    player, 
-    currentPlayerDegrees,
-    currentPlayerVelocity,
-    playerRadians,
-    lastPlayerDegrees,
-    playerVelocity,
-    lastPlayerVelocity,
+    world,
+    player,
     fireCount,
     cpu,
-    cpuRadians,
     level,
     planet,
     playerScore,
@@ -28,11 +21,20 @@
     isPlayerTurn,
     isShotInProgress,
     walls,
-    isShootingEnabled,
     mouseConstraint,
     mousedownPosition,
     mouse
-    } from './stores.js';
+  } from './stores/writable';
+  import {
+    currentPlayerDegrees,
+    currentPlayerVelocity,
+    playerRadians,
+    lastPlayerDegrees,
+    playerVelocity,
+    lastPlayerVelocity,
+    cpuRadians,
+    isShootingEnabled,
+  } from './stores/derived';
 
   onMount(() => {
     setupMatter();
