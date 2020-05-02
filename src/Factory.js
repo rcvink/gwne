@@ -120,7 +120,7 @@ const createCircle = (x, y, radius, options) =>
 const createVector = (radians) =>
   Matter.Vector.create(Math.cos(radians), Math.sin(radians));
 
-export const factory = {
+export default {
   createEngine,
   createRunner,
   createWalls,
