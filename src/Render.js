@@ -76,7 +76,8 @@ const Mouse = Matter.Mouse;
                 showMousePosition: false,
                 showShotIndicator: false,
                 playerPosition: null,
-                shotIndicatorVelocity: 0
+                shotIndicatorVelocity: 0,
+                shotIndicatorDegrees: 0
             }
         };
 
@@ -94,6 +95,7 @@ const Mouse = Matter.Mouse;
         render.textures = {};
         render.playerPosition = options.playerPosition;
         render.shotIndicatorVelocity = options.shotIndicatorVelocity;
+        render.shotIndicatorDegrees = options.shotIndicatorDegrees;
 
         render.bounds = render.bounds || { 
             min: { 
@@ -835,7 +837,8 @@ const Mouse = Matter.Mouse;
         c.moveTo(mouse.position.x, mouse.position.y);
         c.fillText(`v: ${render.shotIndicatorVelocity}`, mouse.position.x + 15, mouse.position.y + 10);
         c.lineTo(render.playerPosition.x, render.playerPosition.y);
-        c.lineTo(render.playerPosition.x + render.canvas.width / 6, render.playerPosition.y);
+        c.fillText(`a: ${render.shotIndicatorDegrees}°`, render.playerPosition.x + 15, render.playerPosition.y + 15);
+        c.lineTo(render.playerPosition.x + render.canvas.width / 12, render.playerPosition.y);
         c.setLineDash([10, 10]);
         c.stroke();
     };

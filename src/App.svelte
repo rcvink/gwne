@@ -93,8 +93,9 @@
   }
 
   const registerPermanentListeners = () => {
-    trackCurrentPlayerVelocity();
     trackMousePosition();
+    trackCurrentPlayerVelocity();
+    trackCurrentPlayerDegrees();
     playerFireOnClick();
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
@@ -126,6 +127,9 @@
     
   const trackCurrentPlayerVelocity = () =>
     currentPlayerVelocity.subscribe(n => $render.shotIndicatorVelocity = n);
+
+  const trackCurrentPlayerDegrees = () =>
+    currentPlayerDegrees.subscribe(n => $render.shotIndicatorDegrees = n);
 
   const playerFireOnClick = () =>
     Matter.Events.on($mouseConstraint, "mousedown", (event) => {
@@ -254,9 +258,6 @@
 </div>
 <div>
   last angle: {$lastPlayerDegrees || "N/A"}
-</div>
-<div>
-  current angle: {$currentPlayerDegrees}°
 </div>
 <div>
   {#if $isShootingEnabled}
