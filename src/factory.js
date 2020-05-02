@@ -1,6 +1,6 @@
 import Matter from "matter-js";
 import Render from "./Render";
-import { CONSTANTS } from './constants'
+import Constants from './Constants'
 import { service } from './service';
 
 const createEngine = () =>
@@ -14,42 +14,42 @@ const createWalls = (renderWidth, renderHeight) => {
     .getWallsDimensions(renderWidth, renderHeight);
 
   return [
-    createRectangle(top, CONSTANTS.WALL_OPTIONS),
-    createRectangle(bottom, CONSTANTS.WALL_OPTIONS),
-    createRectangle(left, CONSTANTS.WALL_OPTIONS),
-    createRectangle(right, CONSTANTS.WALL_OPTIONS),
+    createRectangle(top, Constants.WALL_OPTIONS),
+    createRectangle(bottom, Constants.WALL_OPTIONS),
+    createRectangle(left, Constants.WALL_OPTIONS),
+    createRectangle(right, Constants.WALL_OPTIONS),
   ];
 }
 
 const createPlanet = (renderWidth, renderHeight) => {
   let { x, y, r } = service.getPlanetDimensions(renderWidth, renderHeight);
-  let planet = createCircle(x, y, r, CONSTANTS.PLANET_OPTIONS);
-  Matter.Body.setDensity(planet, CONSTANTS.DENSITIES.planet);
+  let planet = createCircle(x, y, r, Constants.PLANET_OPTIONS);
+  Matter.Body.setDensity(planet, Constants.DENSITIES.planet);
   planet.plugin = { attractors: [ service.gravityOnColliders ] };
   return planet;
 }
 
 const createPlayer = (renderWidth, renderHeight) => {
   let { x, y } = service.getPlayerDimensions(renderWidth, renderHeight);
-  return createSquare(x, y, CONSTANTS.PLAYER_LENGTH, CONSTANTS.PLAYER_OPTIONS);
+  return createSquare(x, y, Constants.PLAYER_LENGTH, Constants.PLAYER_OPTIONS);
 }
 
 const createCpu = (renderWidth, renderHeight) => {
   let { x, y } = service.getCpuDimensions(renderWidth, renderHeight);
-  return createSquare(x, y, CONSTANTS.CPU_LENGTH, CONSTANTS.CPU_OPTIONS);
+  return createSquare(x, y, Constants.CPU_LENGTH, Constants.CPU_OPTIONS);
 }
 
 const createRender = (document, engine) =>
   Render.create({
-    element: document.getElementById(CONSTANTS.CANVAS_ID),
+    element: document.getElementById(Constants.CANVAS_ID),
     engine: engine,
     options: {
       width: Math.min(
         document.documentElement.clientWidth, 
-        CONSTANTS.RENDER_MAX_WIDTH),
+        Constants.RENDER_MAX_WIDTH),
       height: Math.min(
         document.documentElement.clientHeight, 
-        CONSTANTS.RENDER_MAX_HEIGHT),
+        Constants.RENDER_MAX_HEIGHT),
       showShotIndicator: true
     }
   });
@@ -66,12 +66,12 @@ const createMouseConstraint = (engine, mouse) =>
 const createBullet = (fromBody, offset, rads, collisionFilter) => {
   let translateBy = Matter.Vector.mult(createVector(rads), offset);
   let position = Matter.Vector.add(fromBody.position, translateBy);
-  let options = CONSTANTS.BULLET_OPTIONS;
+  let options = Constants.BULLET_OPTIONS;
   options.collisionFilter = collisionFilter;
   return createCircle(
     position.x,
     position.y,
-    CONSTANTS.BULLET_SIZE,
+    Constants.BULLET_SIZE,
     options);
 }
 
@@ -81,14 +81,14 @@ const createBulletForce = (radians, velocity) =>
 const createParticles = (fromBody) => {
   let particles = [];
 
-  for (let i = 0; i <= CONSTANTS.EXPLOSION_PARTICLE_COUNT; i++) {
+  for (let i = 0; i <= Constants.EXPLOSION_PARTICLE_COUNT; i++) {
     particles.push(createCircle(
       fromBody.position.x, 
       fromBody.position.y, 
       Matter.Common.random(
-        CONSTANTS.PARTICLE_SIZE_MIN, 
-        CONSTANTS.PARTICLE_SIZE_MAX), 
-      CONSTANTS.PARTICLE_OPTIONS));
+        Constants.PARTICLE_SIZE_MIN, 
+        Constants.PARTICLE_SIZE_MAX), 
+      Constants.PARTICLE_OPTIONS));
   }
 
   return particles;
@@ -99,14 +99,14 @@ const createTrail = (fromBody, size) =>
     fromBody.position.x, 
     fromBody.position.y, 
     size, 
-    CONSTANTS.TRAIL_OPTIONS);
+    Constants.TRAIL_OPTIONS);
 
 const createLastShotIndicator = (position) =>
   createCircle(
     position.x,
     position.y,
-    CONSTANTS.LAST_SHOT_INDICATOR_SIZE,
-    CONSTANTS.LAST_SHOT_INDICATOR_OPTIONS);
+    Constants.LAST_SHOT_INDICATOR_SIZE,
+    Constants.LAST_SHOT_INDICATOR_OPTIONS);
 
 const createRectangle = (dims, options) =>
   Matter.Bodies.rectangle(dims.x, dims.y, dims.w, dims.h, options);

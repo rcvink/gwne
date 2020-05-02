@@ -49,38 +49,44 @@ const CATEGORIES = {
     wall: Matter.Body.nextCategory(),
     lastShotIndicator: Matter.Body.nextCategory(),
 };
+const MASKS = {
+    bullet: CATEGORIES.player |
+        CATEGORIES.cpu | 
+        CATEGORIES.planet |
+        CATEGORIES.wall,
+    cpu: CATEGORIES.bullet.player | 
+        CATEGORIES.bullet.cpu,
+    particle: CATEGORIES.particle,
+    planet: CATEGORIES.bullet.player | 
+        CATEGORIES.bullet.cpu,
+    player: CATEGORIES.bullet.cpu | 
+        CATEGORIES.bullet.player,
+    trail: CATEGORIES.trail,
+    wall: CATEGORIES.bullet.player | 
+        CATEGORIES.bullet.cpu,
+};
 const COLLISION_FILTERS = {
     player: {
         group,
         category: CATEGORIES.player,
-        mask: CATEGORIES.bullet.cpu | CATEGORIES.bullet.player
+        mask: MASKS.player,
     },
     cpu: {
         group,
         category: CATEGORIES.cpu,
-        mask: CATEGORIES.bullet.player | CATEGORIES.bullet.cpu
+        mask: MASKS.cpu,
     },
     bullets: {
         player: {
             group,
             category: CATEGORIES.bullet.player,
-            mask: CATEGORIES.cpu | 
-                CATEGORIES.player |
-                CATEGORIES.planet | 
-                CATEGORIES.bullet.player | 
-                CATEGORIES.bullet.cpu |
-                CATEGORIES.wall
+            mask: MASKS.bullet,
         },
         cpu: {
             group,
             category: CATEGORIES.bullet.cpu,
-            mask: CATEGORIES.player |
-                CATEGORIES.cpu | 
-                CATEGORIES.planet |
-                CATEGORIES.bullet.player | 
-                CATEGORIES.bullet.cpu |
-                CATEGORIES.wall
-        }
+            mask: MASKS.bullet,
+        },
     },
     planet: {
         group,
@@ -168,7 +174,7 @@ const WALL_OPTIONS = {
 };
 const WALL_THICKNESS = 50;
 
-export const CONSTANTS = {
+export default {
     BULLET_OPTIONS, 
     BULLET_SIZE,
     CANVAS_ID,

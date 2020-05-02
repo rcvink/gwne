@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import { CONSTANTS } from './constants';
+import Constants from './Constants';
 
 const position = {
     x: 0,
@@ -43,7 +43,7 @@ export const lastPlayerDegrees = derived(
 export const currentPlayerVelocity = derived(
     [ mouse, player ],
     ([ $mouse, $player ]) => {
-        let velocity = CONSTANTS.PLAYER_VELOCITY_FACTOR * Math.hypot(
+        let velocity = Constants.PLAYER_VELOCITY_FACTOR * Math.hypot(
             $player.position.x - $mouse.position.x,
             $player.position.y - $mouse.position.y);
         return Math.round(velocity * 10) / 10;
@@ -51,7 +51,7 @@ export const currentPlayerVelocity = derived(
 export const playerVelocity = derived(
     [ mousedownPosition, player ],
     ([ $mousedownPosition, $player ]) =>
-        CONSTANTS.PLAYER_VELOCITY_FACTOR * Math.hypot(
+        Constants.PLAYER_VELOCITY_FACTOR * Math.hypot(
             $player.position.x - $mousedownPosition.x,
             $player.position.y - $mousedownPosition.y));
 export const lastPlayerVelocity = derived(
