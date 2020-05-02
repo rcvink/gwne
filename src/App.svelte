@@ -2,11 +2,13 @@
   import Matter from "matter-js";
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
+  import BodyFactory from './factories/BodyFactory';
   import Constants from './Constants';
   import Factory from './Factory';
   import Render from "./Render";
   import GravityService from './services/GravityService';
   import RandomService from './services/RandomService';
+  import VectorService from './services/VectorService';
   import {
     engine,
     runner,
@@ -67,21 +69,21 @@
   }
 
   const setWalls = () =>
-    walls.set(Factory.createWalls(
+    walls.set(BodyFactory.createWalls(
       $render.options.width,
       $render.options.height
     ));
 
   const startNewLevel = () => {
     removeFromWorld(getAllBodies());
-    planet.set(Factory.createPlanet(
+    planet.set(BodyFactory.createPlanet(
       $render.options.width, 
       $render.options.height));
-    player.set(Factory.createPlayer(
+    player.set(BodyFactory.createPlayer(
       $render.options.width,
       $render.options.height));
     $render.playerPosition = $player.position;
-    cpu.set(Factory.createCpu(
+    cpu.set(BodyFactory.createCpu(
       $render.options.width,
       $render.options.height));
     populateWorld([ 
@@ -149,7 +151,7 @@
         collisionFilter: Constants.COLLISION_FILTERS.bullets.player
       });
       fireCount.update(n => n + 1);
-      populateWorld(Factory.createLastShotIndicator($mousedownPosition));
+      populateWorld(BodyFactory.createLastShotIndicator($mousedownPosition));
     });
 
   const cpuFireOnCpuTurn = () =>
@@ -197,7 +199,7 @@
 
       isShotInProgress.set(false);
       if (options.animate) {
-        populateWorld(Factory.createParticles(bullet));
+        populateWorld(BodyFactory.createParticles(bullet));
       }
       removeFromWorld(bullet);
       if (options.destroyOtherBody) {
@@ -212,7 +214,7 @@
     Matter.Events.on($engine, "afterUpdate", (event) => 
       getAllBodies()
         .filter(body => categoriesToTrail.includes(body.collisionFilter.category))
-        .forEach(bodyToTrail => populateWorld(Factory.createTrail(bodyToTrail, trailSize))));
+        .forEach(bodyToTrail => populateWorld(BodyFactory.createTrail(bodyToTrail, trailSize))));
 
   const removeSleepingOnUpdate = (categoriesToRemove) => 
     Matter.Events.on($engine, "afterUpdate", (event) =>
@@ -226,7 +228,7 @@
 
   const fire = (options) => {
     isShotInProgress.set(true);
-    let bullet = Factory.createBullet(
+    let bullet = BodyFactory.createBullet(
       options.fromBody,
       options.offset,
       options.rads,
@@ -236,7 +238,7 @@
     Matter.Body.applyForce(
       bullet,
       bullet.position,
-      Factory.createBulletForce(options.rads, options.velocity));
+      VectorService.createBulletForce(options.rads, options.velocity));
   }
 
   const removeFromWorld = (objectsToRemove) =>
