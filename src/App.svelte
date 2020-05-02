@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
   import Constants from './Constants';
   import Factory from './Factory';
-  import { service } from './service.js';
+  import Service from './Service';
   import { 
     engine,
     runner,
@@ -48,7 +48,7 @@
     engine.set(Factory.createEngine());
     render.set(Factory.createRender(document, $engine));
     runner.set(Factory.createRunner());
-    service.setGravityZero($engine);
+    Service.setGravityZero($engine);
     world.set($engine.world);
   }
 
@@ -159,8 +159,8 @@
     fire({
       fromBody: $cpu,
       offset: Constants.CPU_LENGTH,
-      rads: service.randomise($cpuRadians, Constants.CPU_ANGLE_RANDOMNESS_FACTOR),
-      velocity: service.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
+      rads: Service.randomise($cpuRadians, Constants.CPU_ANGLE_RANDOMNESS_FACTOR),
+      velocity: Service.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
       collisionFilter: Constants.COLLISION_FILTERS.bullets.cpu
     });
   }

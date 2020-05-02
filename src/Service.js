@@ -1,4 +1,4 @@
-import Matter from "matter-js";
+import Matter from 'matter-js';
 import Constants from './Constants'
 
 const getWallsDimensions = (renderWidth, renderHeight) => 
@@ -85,7 +85,7 @@ const randomise = (value, factor) =>
 const getRandomInRange = (min, max) => 
   Math.random() * (max - min) + min;
 
-export const service = {
+export default {
   getWallsDimensions,
   getCpuDimensions,
   getPlanetDimensions,

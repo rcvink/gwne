@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 import Render from "./Render";
 import Constants from './Constants'
-import { service } from './service';
+import Service from './Service';
 
 const createEngine = () =>
   Matter.Engine.create({enableSleeping: true});
@@ -10,7 +10,7 @@ const createRunner = () =>
   Matter.Runner.create();
 
 const createWalls = (renderWidth, renderHeight) => {
-  let { top, bottom, left, right } = service
+  let { top, bottom, left, right } = Service
     .getWallsDimensions(renderWidth, renderHeight);
 
   return [
@@ -22,20 +22,20 @@ const createWalls = (renderWidth, renderHeight) => {
 }
 
 const createPlanet = (renderWidth, renderHeight) => {
-  let { x, y, r } = service.getPlanetDimensions(renderWidth, renderHeight);
+  let { x, y, r } = Service.getPlanetDimensions(renderWidth, renderHeight);
   let planet = createCircle(x, y, r, Constants.PLANET_OPTIONS);
   Matter.Body.setDensity(planet, Constants.DENSITIES.planet);
-  planet.plugin = { attractors: [ service.gravityOnColliders ] };
+  planet.plugin = { attractors: [ Service.gravityOnColliders ] };
   return planet;
 }
 
 const createPlayer = (renderWidth, renderHeight) => {
-  let { x, y } = service.getPlayerDimensions(renderWidth, renderHeight);
+  let { x, y } = Service.getPlayerDimensions(renderWidth, renderHeight);
   return createSquare(x, y, Constants.PLAYER_LENGTH, Constants.PLAYER_OPTIONS);
 }
 
 const createCpu = (renderWidth, renderHeight) => {
-  let { x, y } = service.getCpuDimensions(renderWidth, renderHeight);
+  let { x, y } = Service.getCpuDimensions(renderWidth, renderHeight);
   return createSquare(x, y, Constants.CPU_LENGTH, Constants.CPU_OPTIONS);
 }
 
