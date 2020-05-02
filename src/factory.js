@@ -60,7 +60,7 @@ const createMouse = (canvas) =>
 const createMouseConstraint = (engine, mouse) => 
   Matter.MouseConstraint.create(engine, {
     mouse,
-    constraint: { render: { visible: true } }
+    constraint: { render: { visible: false } }
   });
 
 const createBullet = (fromBody, offset, rads, collisionFilter) => {

@@ -1,6 +1,8 @@
 NOW IDEAS:
-- CPU improves shots
-- Render angle and power as user is aiming
+- Hold to shoot
+- Move trails out of physics into rendering
+- Move last shot location out of physics into rendering
+- CPU improves shots, varying difficulties
 
 MAYBE:
 - velocity based on length of mousedown? 
