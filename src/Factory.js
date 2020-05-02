@@ -1,8 +1,8 @@
 import Matter from "matter-js";
 import Render from "./Render";
 import Constants from './Constants'
-import Service from './Service';
 import DimensionService from './services/DimensionService';
+import GravityService from './services/GravityService';
 
 const createEngine = () =>
   Matter.Engine.create({enableSleeping: true});
@@ -27,7 +27,7 @@ const createPlanet = (renderWidth, renderHeight) => {
     .getPlanetDimensions(renderWidth, renderHeight);
   let planet = createCircle(x, y, r, Constants.PLANET_OPTIONS);
   Matter.Body.setDensity(planet, Constants.DENSITIES.planet);
-  planet.plugin = { attractors: [ Service.gravityOnColliders ] };
+  planet.plugin = { attractors: [ GravityService.gravityOnColliders ] };
   return planet;
 }
 

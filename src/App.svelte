@@ -5,6 +5,7 @@
   import Constants from './Constants';
   import Factory from './Factory';
   import Render from "./Render";
+  import GravityService from './services/GravityService';
   import Service from './Service';
   import {
     engine,
@@ -50,7 +51,7 @@
     engine.set(Factory.createEngine());
     render.set(Factory.createRender(document, $engine));
     runner.set(Factory.createRunner());
-    Service.setGravityZero($engine);
+    GravityService.setGravityZero($engine);
     world.set($engine.world);
   }
 
