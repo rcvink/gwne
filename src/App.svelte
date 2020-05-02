@@ -3,16 +3,16 @@
   import MatterAttractors from "matter-attractors";
   import { onMount } from "svelte";
 
-  import BodyFactory from './factories/BodyFactory';
-  import Categories from './constants/Categories';
-  import CollisionFilters from './constants/CollisionFilters';
-  import Constants from './Constants';
-  import Dimensions from './constants/Dimensions';
-  import GameFactory from './factories/GameFactory';
-  import GravityService from './services/GravityService';
-  import RandomService from './services/RandomService';
-  import Render from './Render';
-  import VectorService from './services/VectorService';
+  import BodyFactory from "./factories/BodyFactory";
+  import Categories from "./constants/Categories";
+  import CollisionFilters from "./constants/CollisionFilters";
+  import Dimensions from "./constants/Dimensions";
+  import GameFactory from "./factories/GameFactory";
+  import GravityService from "./services/GravityService";
+  import Physics from "./constants/Physics";
+  import RandomService from "./services/RandomService";
+  import Render from "./Render";
+  import VectorService from "./services/VectorService";
 
   import {
     engine,
@@ -32,8 +32,8 @@
     mouseConstraint,
     mousedownPosition,
     mouse
-  } from './stores/writable';
-  
+  } from "./stores/writable";
+
   import {
     currentPlayerDegrees,
     currentPlayerVelocity,
@@ -42,8 +42,10 @@
     playerVelocity,
     lastPlayerVelocity,
     cpuRadians,
-    isShootingEnabled,
-  } from './stores/derived';
+    isShootingEnabled
+  } from "./stores/derived";
+
+  const canvasId = "canvas";
 
   onMount(() => {
     setupMatter();
@@ -57,51 +59,45 @@
   const setupMatter = () => {
     Matter.use(MatterAttractors);
     engine.set(GameFactory.createEngine());
-    render.set(GameFactory.createRender(document, $engine));
+    render.set(GameFactory.createRender(document, $engine, canvasId));
     runner.set(GameFactory.createRunner());
     GravityService.setGravityZero($engine);
     world.set($engine.world);
-  }
+  };
 
   const runMatter = () => {
     Matter.Runner.run($runner, $engine);
     Render.run($render);
-  }
+  };
 
   const setupMouse = () => {
     mouse.set(GameFactory.createMouse($render.canvas));
     mouseConstraint.set(GameFactory.createMouseConstraint($engine, $mouse));
     $render.mouse = $mouse;
-  }
+  };
 
   const setWalls = () =>
-    walls.set(BodyFactory.createWalls(
-      $render.options.width,
-      $render.options.height
-    ));
+    walls.set(
+      BodyFactory.createWalls($render.options.width, $render.options.height)
+    );
 
   const startNewLevel = () => {
     removeFromWorld(getAllBodies());
-    planet.set(BodyFactory.createPlanet(
-      $render.options.width, 
-      $render.options.height));
-    player.set(BodyFactory.createPlayer(
-      $render.options.width,
-      $render.options.height));
+    planet.set(
+      BodyFactory.createPlanet($render.options.width, $render.options.height)
+    );
+    player.set(
+      BodyFactory.createPlayer($render.options.width, $render.options.height)
+    );
     $render.playerPosition = $player.position;
-    cpu.set(BodyFactory.createCpu(
-      $render.options.width,
-      $render.options.height));
-    populateWorld([ 
-      $planet, 
-      $player, 
-      $cpu, 
-      ...$walls, 
-      $mouseConstraint]);
+    cpu.set(
+      BodyFactory.createCpu($render.options.width, $render.options.height)
+    );
+    populateWorld([$planet, $player, $cpu, ...$walls, $mouseConstraint]);
     level.update(n => n + 1);
     fireCount.set(0);
     isPlayerTurn.set(true);
-  }
+  };
 
   const registerPermanentListeners = () => {
     trackMousePosition();
@@ -110,74 +106,84 @@
     playerFireOnClick();
     cpuFireOnCpuTurn();
     winOrLoseOnHit();
-    bulletsExplodeOnCollisionWithCategory(
-      Categories.CPU,
-      { animate: true, destroyOtherBody: true, updateTurn: false}); 
-    bulletsExplodeOnCollisionWithCategory(
-      Categories.PLAYER,
-      { animate: true, destroyOtherBody: true, updateTurn: false });
-    bulletsExplodeOnCollisionWithCategory(
-      Categories.PLANET,
-      { animate: true, destroyOtherBody: false, updateTurn: true });
-    bulletsExplodeOnCollisionWithCategory(
-      Categories.WALL,
-      { animate: false, destroyOtherBody: false, updateTurn: true }); 
-    trailOnUpdate([ 
-      Categories.BULLET.CPU, 
-      Categories.BULLET.PLAYER ],
-      Dimensions.TRAIL_BULLET_SIZE);
+    bulletsExplodeOnCollisionWithCategory(Categories.CPU, {
+      animate: true,
+      destroyOtherBody: true,
+      updateTurn: false
+    });
+    bulletsExplodeOnCollisionWithCategory(Categories.PLAYER, {
+      animate: true,
+      destroyOtherBody: true,
+      updateTurn: false
+    });
+    bulletsExplodeOnCollisionWithCategory(Categories.PLANET, {
+      animate: true,
+      destroyOtherBody: false,
+      updateTurn: true
+    });
+    bulletsExplodeOnCollisionWithCategory(Categories.WALL, {
+      animate: false,
+      destroyOtherBody: false,
+      updateTurn: true
+    });
     trailOnUpdate(
-      [ Categories.PARTICLE ],
-      Dimensions.TRAIL_PARTICLE_SIZE);
-    removeSleepingOnUpdate(
-      [ Categories.PARTICLE, Categories.TRAIL ]);
-  }
+      [Categories.BULLET.CPU, Categories.BULLET.PLAYER],
+      Dimensions.TRAIL_BULLET_SIZE
+    );
+    trailOnUpdate([Categories.PARTICLE], Dimensions.TRAIL_PARTICLE_SIZE);
+    removeSleepingOnUpdate([Categories.PARTICLE, Categories.TRAIL]);
+  };
 
   const trackMousePosition = () =>
     Matter.Events.on($engine, "afterUpdate", () => mouse.set($mouse));
-    
+
   const trackCurrentPlayerVelocity = () =>
-    currentPlayerVelocity.subscribe(n => $render.shotIndicatorVelocity = n);
+    currentPlayerVelocity.subscribe(n => ($render.shotIndicatorVelocity = n));
 
   const trackCurrentPlayerDegrees = () =>
-    currentPlayerDegrees.subscribe(n => $render.shotIndicatorDegrees = n);
+    currentPlayerDegrees.subscribe(n => ($render.shotIndicatorDegrees = n));
 
   const playerFireOnClick = () =>
-    Matter.Events.on($mouseConstraint, "mousedown", (event) => {
+    Matter.Events.on($mouseConstraint, "mousedown", event => {
       if (!$isShootingEnabled) {
         return;
       }
-    
+
       mousedownPosition.set(event.mouse.mousedownPosition);
       fire({
         fromBody: $player,
         offset: Dimensions.PLAYER_LENGTH,
         rads: $playerRadians,
         velocity: $playerVelocity,
-        collisionFilter: CollisionFilters.BULLETS.PLAYER,
+        collisionFilter: CollisionFilters.BULLETS.PLAYER
       });
       fireCount.update(n => n + 1);
       populateWorld(BodyFactory.createLastShotIndicator($mousedownPosition));
     });
 
-  const cpuFireOnCpuTurn = () =>
-    isPlayerTurn.subscribe(fireIfCpuTurn);
+  const cpuFireOnCpuTurn = () => isPlayerTurn.subscribe(fireIfCpuTurn);
 
-  const fireIfCpuTurn = (isNowPlayerTurn) => {
+  const fireIfCpuTurn = isNowPlayerTurn => {
     if (isNowPlayerTurn) {
       return;
     }
     fire({
       fromBody: $cpu,
       offset: Dimensions.CPU_LENGTH,
-      rads: RandomService.randomise($cpuRadians, Dimensions.CPU_ANGLE_RANDOMNESS_FACTOR),
-      velocity: RandomService.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
-      collisionFilter: CollisionFilters.BULLETS.CPU,
+      rads: RandomService.randomise(
+        $cpuRadians,
+        Dimensions.CPU_ANGLE_RANDOMNESS_FACTOR
+      ),
+      velocity: RandomService.getRandomInRange(
+        Physics.CPU_VELOCITY_MIN,
+        Physics.CPU_VELOCITY_MAX
+      ),
+      collisionFilter: CollisionFilters.BULLETS.CPU
     });
-  }
+  };
 
-  const winOrLoseOnHit = () => 
-    Matter.Events.on($engine, "collisionStart", (event) => {
+  const winOrLoseOnHit = () =>
+    Matter.Events.on($engine, "collisionStart", event => {
       let pairs = event.pairs[0];
       if (pairs.bodyA.id === $cpu.id || pairs.bodyB.id === $cpu.id) {
         playerScore.update(n => n + 1);
@@ -185,11 +191,11 @@
       } else if (pairs.bodyA.id === $player.id || pairs.bodyB.id === $cpu.id) {
         cpuScore.update(n => n + 1);
         startNewLevel();
-      } 
+      }
     });
 
   const bulletsExplodeOnCollisionWithCategory = (category, options) =>
-    Matter.Events.on($engine, "collisionStart", (event) => {
+    Matter.Events.on($engine, "collisionStart", event => {
       let bullet, other;
       let pairs = event.pairs[0];
 
@@ -217,67 +223,62 @@
     });
 
   const trailOnUpdate = (categoriesToTrail, trailSize) =>
-    Matter.Events.on($engine, "afterUpdate", (event) => 
+    Matter.Events.on($engine, "afterUpdate", event =>
       getAllBodies()
-        .filter(body => categoriesToTrail.includes(body.collisionFilter.category))
-        .forEach(bodyToTrail => populateWorld(BodyFactory.createTrail(bodyToTrail, trailSize))));
+        .filter(body =>
+          categoriesToTrail.includes(body.collisionFilter.category)
+        )
+        .forEach(bodyToTrail =>
+          populateWorld(BodyFactory.createTrail(bodyToTrail, trailSize))
+        )
+    );
 
-  const removeSleepingOnUpdate = (categoriesToRemove) => 
-    Matter.Events.on($engine, "afterUpdate", (event) =>
+  const removeSleepingOnUpdate = categoriesToRemove =>
+    Matter.Events.on($engine, "afterUpdate", event =>
       getAllBodies()
         .filter(body => body.isSleeping)
-        .filter(sleepingBody => categoriesToRemove.includes(sleepingBody.collisionFilter.category))
-        .forEach(removeFromWorld));
+        .filter(sleepingBody =>
+          categoriesToRemove.includes(sleepingBody.collisionFilter.category)
+        )
+        .forEach(removeFromWorld)
+    );
 
-  const populateWorld = (objectsToAdd) =>
-    Matter.World.add($world, objectsToAdd);
+  const populateWorld = objectsToAdd => Matter.World.add($world, objectsToAdd);
 
-  const fire = (options) => {
+  const fire = options => {
     isShotInProgress.set(true);
     let bullet = BodyFactory.createBullet(
       options.fromBody,
       options.offset,
       options.rads,
-      options.collisionFilter);
+      options.collisionFilter
+    );
 
     populateWorld(bullet);
     Matter.Body.applyForce(
       bullet,
       bullet.position,
-      VectorService.createBulletForce(options.rads, options.velocity));
-  }
+      VectorService.createBulletForce(options.rads, options.velocity)
+    );
+  };
 
-  const removeFromWorld = (objectsToRemove) =>
+  const removeFromWorld = objectsToRemove =>
     Matter.World.remove($world, objectsToRemove);
 
-  const getAllBodies = () =>
-    Matter.Composite.allBodies($world);
-
+  const getAllBodies = () => Matter.Composite.allBodies($world);
 </script>
 
-<div>
-  level: {$level}
-</div>
-<div>
-  player score: {$playerScore}
-</div>
-<div>
-  cpu score: {$cpuScore}
-</div>
-<div>
-  last velocity: {$lastPlayerVelocity || "N/A"}
-</div>
-<div>
-  last angle: {$lastPlayerDegrees || "N/A"}
-</div>
+<div>level: {$level}</div>
+<div>player score: {$playerScore}</div>
+<div>cpu score: {$cpuScore}</div>
+<div>last velocity: {$lastPlayerVelocity || 'N/A'}</div>
+<div>last angle: {$lastPlayerDegrees || 'N/A'}</div>
 <div>
   {#if $isShootingEnabled}
     <b>click to fire.</b>
   {:else if $isPlayerTurn}
     player shot in progress...
-  {:else if !$isPlayerTurn}
-    cpu shot in progress...
-  {/if}
+  {:else if !$isPlayerTurn}cpu shot in progress...{/if}
 </div>
 
-<div id="{Constants.CANVAS_ID}"/>
+<div id={canvasId} />

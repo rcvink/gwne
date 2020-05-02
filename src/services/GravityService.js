@@ -1,5 +1,5 @@
 import Matter from 'matter-js';
-import Constants from '../Constants'
+import Physics from '../constants/Physics'
 
 const gravityOnColliders = (bodyA, bodyB) => {
     if (!Matter.Detector.canCollide(bodyA.collisionFilter, bodyB.collisionFilter)) {
@@ -8,7 +8,7 @@ const gravityOnColliders = (bodyA, bodyB) => {
     let bToA = Matter.Vector.sub(bodyB.position, bodyA.position);
     let distanceSq = Matter.Vector.magnitudeSquared(bToA) || 0.0001;
     let normal = Matter.Vector.normalise(bToA)
-    let magnitude = -Constants.GRAVITATIONAL_CONSTANT *
+    let magnitude = -Physics.GRAVITATIONAL_CONSTANT *
         (bodyA.mass * bodyB.mass / distanceSq);
     return Matter.Vector.mult(normal, magnitude);
 }

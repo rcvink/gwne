@@ -1,11 +1,11 @@
 import Matter from 'matter-js';
 
 import BodyOptions from '../constants/BodyOptions';
-import Constants from '../Constants';
 import Densities from '../constants/Densities';
 import Dimensions from '../constants/Dimensions';
 import DimensionService from '../services/DimensionService';
 import GravityService from '../services/GravityService';
+import Physics from '../constants/Physics';
 import VectorService from '../services/VectorService';
 
 const createBullet = (fromBody, offset, rads, collisionFilter) => {
@@ -35,7 +35,7 @@ const createLastShotIndicator = (position) =>
 const createParticles = (fromBody) => {
     let particles = [];
 
-    for (let i = 0; i <= Constants.EXPLOSION_PARTICLE_COUNT; i++) {
+    for (let i = 0; i <= Physics.EXPLOSION_PARTICLE_COUNT; i++) {
         particles.push(createCircle(
             fromBody.position.x,
             fromBody.position.y,
