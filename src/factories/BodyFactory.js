@@ -1,5 +1,6 @@
-import Matter from "matter-js";
+import Matter from 'matter-js';
 import Constants from '../Constants';
+import Dimensions from '../constants/Dimensions';
 import DimensionService from '../services/DimensionService';
 import GravityService from '../services/GravityService';
 import VectorService from '../services/VectorService';
@@ -12,20 +13,20 @@ const createBullet = (fromBody, offset, rads, collisionFilter) => {
     return createCircle(
         position.x,
         position.y,
-        Constants.BULLET_SIZE,
+        Dimensions.BULLET_SIZE,
         options);
 }
 
 const createCpu = (renderWidth, renderHeight) => {
     let { x, y } = DimensionService.getCpuDimensions(renderWidth, renderHeight);
-    return createSquare(x, y, Constants.CPU_LENGTH, Constants.CPU_OPTIONS);
+    return createSquare(x, y, Dimensions.CPU_LENGTH, Constants.CPU_OPTIONS);
 }
 
 const createLastShotIndicator = (position) =>
     createCircle(
         position.x,
         position.y,
-        Constants.LAST_SHOT_INDICATOR_SIZE,
+        Dimensions.LAST_SHOT_INDICATOR_SIZE,
         Constants.LAST_SHOT_INDICATOR_OPTIONS);
 
 const createParticles = (fromBody) => {
@@ -36,8 +37,8 @@ const createParticles = (fromBody) => {
             fromBody.position.x,
             fromBody.position.y,
             Matter.Common.random(
-                Constants.PARTICLE_SIZE_MIN,
-                Constants.PARTICLE_SIZE_MAX),
+                Dimensions.PARTICLE_SIZE_MIN,
+                Dimensions.PARTICLE_SIZE_MAX),
             Constants.PARTICLE_OPTIONS));
     }
 
@@ -55,7 +56,7 @@ const createPlanet = (renderWidth, renderHeight) => {
 
 const createPlayer = (renderWidth, renderHeight) => {
     let { x, y } = DimensionService.getPlayerDimensions(renderWidth, renderHeight);
-    return createSquare(x, y, Constants.PLAYER_LENGTH, Constants.PLAYER_OPTIONS);
+    return createSquare(x, y, Dimensions.PLAYER_LENGTH, Constants.PLAYER_OPTIONS);
 }
 
 const createTrail = (fromBody, size) =>

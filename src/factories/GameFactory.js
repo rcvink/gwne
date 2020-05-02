@@ -1,6 +1,7 @@
-import Matter from "matter-js";
-import Render from "../Render";
+import Matter from 'matter-js'
+import Render from '../Render';
 import Constants from '../Constants'
+import Dimensions from '../constants/Dimensions';
 
 const createEngine = () =>
   Matter.Engine.create({enableSleeping: true});
@@ -11,14 +12,14 @@ const createRunner = () =>
 const createRender = (document, engine) =>
   Render.create({
     element: document.getElementById(Constants.CANVAS_ID),
-    engine: engine,
+    engine,
     options: {
       width: Math.min(
         document.documentElement.clientWidth, 
-        Constants.RENDER_MAX_WIDTH),
+        Dimensions.RENDER_MAX_WIDTH),
       height: Math.min(
         document.documentElement.clientHeight, 
-        Constants.RENDER_MAX_HEIGHT),
+        Dimensions.RENDER_MAX_HEIGHT),
       showShotIndicator: true
     }
   });

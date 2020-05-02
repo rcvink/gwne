@@ -1,19 +1,20 @@
 import Constants from '../Constants';
-import RandomService from './RandomService';
+import Dimensions from '../constants/Dimensions';
+import RandomService from './RandomService'
 
 const getCpuDimensions = (renderWidth, renderHeight) =>
     ({
         x: RandomService.getRandomInRange(
-            (4 * renderWidth / 5) + (Constants.CPU_LENGTH / 2),
-            renderWidth - (Constants.CPU_LENGTH / 2) - 10),
+            (4 * renderWidth / 5) + (Dimensions.CPU_LENGTH / 2),
+            renderWidth - (Dimensions.CPU_LENGTH / 2) - 10),
         y: RandomService.getRandomInRange(
-            (Constants.CPU_LENGTH / 2) + 10,
-            renderHeight - (Constants.CPU_LENGTH / 2) - 10)
+            (Dimensions.CPU_LENGTH / 2) + 10,
+            renderHeight - (Dimensions.CPU_LENGTH / 2) - 10)
     });
 
 const getPlanetDimensions = (renderWidth, renderHeight) => {
     let r = RandomService.getRandomInRange(
-        Constants.PLANET_RADIUS_MIN,
+        Dimensions.PLANET_RADIUS_MIN,
         Math.min(renderWidth / 8, renderHeight / 8));
     return {
         x: RandomService.getRandomInRange(
@@ -29,11 +30,11 @@ const getPlanetDimensions = (renderWidth, renderHeight) => {
 const getPlayerDimensions = (renderWidth, renderHeight) =>
     ({
         x: RandomService.getRandomInRange(
-            (Constants.PLAYER_LENGTH / 2) + 10,
-            (renderWidth / 5) - (Constants.PLAYER_LENGTH / 2)),
+            (Dimensions.PLAYER_LENGTH / 2) + 10,
+            (renderWidth / 5) - (Dimensions.PLAYER_LENGTH / 2)),
         y: RandomService.getRandomInRange(
-            (Constants.PLAYER_LENGTH / 2) + 10,
-            (renderHeight) - (Constants.PLAYER_LENGTH / 2))
+            (Dimensions.PLAYER_LENGTH / 2) + 10,
+            (renderHeight) - (Dimensions.PLAYER_LENGTH / 2))
     });
 
 const getWallsDimensions = (renderWidth, renderHeight) =>
@@ -42,24 +43,24 @@ const getWallsDimensions = (renderWidth, renderHeight) =>
             x: renderWidth / 2,
             y: renderHeight * -1,
             w: renderWidth * 3,
-            h: Constants.WALL_THICKNESS
+            h: Dimensions.WALL_THICKNESS
         },
         bottom: {
             x: renderWidth / 2,
             y: renderHeight * 2,
             w: renderWidth * 3,
-            h: Constants.WALL_THICKNESS
+            h: Dimensions.WALL_THICKNESS
         },
         left: {
             x: renderWidth * -1,
             y: renderHeight / 2,
-            w: Constants.WALL_THICKNESS,
+            w: Dimensions.WALL_THICKNESS,
             h: renderHeight * 3
         },
         right: {
             x: renderWidth * 2,
             y: renderHeight / 2,
-            w: Constants.WALL_THICKNESS,
+            w: Dimensions.WALL_THICKNESS,
             h: renderHeight * 3
         }
     });
@@ -69,4 +70,4 @@ export default {
     getPlanetDimensions,
     getPlayerDimensions,
     getWallsDimensions,
-}
+};

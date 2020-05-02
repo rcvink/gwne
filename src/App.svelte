@@ -5,6 +5,7 @@
 
   import BodyFactory from './factories/BodyFactory';
   import Constants from './Constants';
+  import Dimensions from './constants/Dimensions';
   import GameFactory from './factories/GameFactory';
   import Render from './Render';
   import GravityService from './services/GravityService';
@@ -122,10 +123,10 @@
     trailOnUpdate([ 
       Constants.CATEGORIES.bullet.cpu, 
       Constants.CATEGORIES.bullet.player ],
-      Constants.TRAIL_BULLET_SIZE);
+      Dimensions.TRAIL_BULLET_SIZE);
     trailOnUpdate(
       [ Constants.CATEGORIES.particle ],
-      Constants.TRAIL_PARTICLE_SIZE);
+      Dimensions.TRAIL_PARTICLE_SIZE);
     removeSleepingOnUpdate(
       [ Constants.CATEGORIES.particle, Constants.CATEGORIES.trail ]);
   }
@@ -148,7 +149,7 @@
       mousedownPosition.set(event.mouse.mousedownPosition);
       fire({
         fromBody: $player,
-        offset: Constants.PLAYER_LENGTH,
+        offset: Dimensions.PLAYER_LENGTH,
         rads: $playerRadians,
         velocity: $playerVelocity,
         collisionFilter: Constants.COLLISION_FILTERS.bullets.player
@@ -166,8 +167,8 @@
     }
     fire({
       fromBody: $cpu,
-      offset: Constants.CPU_LENGTH,
-      rads: RandomService.randomise($cpuRadians, Constants.CPU_ANGLE_RANDOMNESS_FACTOR),
+      offset: Dimensions.CPU_LENGTH,
+      rads: RandomService.randomise($cpuRadians, Dimensions.CPU_ANGLE_RANDOMNESS_FACTOR),
       velocity: RandomService.getRandomInRange(Constants.CPU_VELOCITY_MIN, Constants.CPU_VELOCITY_MAX),
       collisionFilter: Constants.COLLISION_FILTERS.bullets.cpu
     });

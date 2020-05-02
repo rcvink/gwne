@@ -30,7 +30,6 @@ const RENDERS = {
     }
 };
 
-const BULLET_SIZE = 3;
 const BULLET_OPTIONS = {
     density: DENSITIES.bullet,
     frictionAir,
@@ -113,14 +112,12 @@ const COLLISION_FILTERS = {
         category: CATEGORIES.lastShotIndicator
     }
 };
-const CPU_ANGLE_RANDOMNESS_FACTOR = 0.1;
 const CPU_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.cpu,
     render: RENDERS.cpu,
     sleepThreshold: SLEEP_THRESHOLD_LONG
 };
-const CPU_LENGTH = 20;
 const CPU_VELOCITY_MIN = 4;
 const CPU_VELOCITY_MAX = 9;
 const EXPLOSION_PARTICLE_COUNT = 10;
@@ -131,7 +128,6 @@ const LAST_SHOT_INDICATOR_OPTIONS = {
     render: RENDERS.lastShotIndicator,
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 }
-const LAST_SHOT_INDICATOR_SIZE = 2;
 const PARTICLE_OPTIONS = {
     collisionFilter: COLLISION_FILTERS.particle,
     density: DENSITIES.particle,
@@ -139,27 +135,19 @@ const PARTICLE_OPTIONS = {
     sleepThreshold: SLEEP_THRESHOLD_SHORT,
     frictionAir
 };
-const PARTICLE_SIZE_MIN = 1;
-const PARTICLE_SIZE_MAX = 4;
 const PLANET_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.planet,
     render: RENDERS.planet,
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
-const PLANET_RADIUS_MIN = 30;
 const PLAYER_OPTIONS = {
     isStatic: true,
     collisionFilter: COLLISION_FILTERS.player,
     render: RENDERS.player,
     sleepThreshold: SLEEP_THRESHOLD_LONG,
 };
-const PLAYER_LENGTH = 20;
 const PLAYER_VELOCITY_FACTOR = 0.01;
-const RENDER_MAX_WIDTH = 1024;
-const RENDER_MAX_HEIGHT = 720;
-const TRAIL_BULLET_SIZE = 2;
-const TRAIL_PARTICLE_SIZE = 1;
 const TRAIL_OPTIONS = {
     isStatic: true,
     isSensor: true,
@@ -172,16 +160,12 @@ const WALL_OPTIONS = {
     collisionFilter: COLLISION_FILTERS.wall,
     sleepThreshold: SLEEP_THRESHOLD_LONG
 };
-const WALL_THICKNESS = 50;
 
 export default {
     BULLET_OPTIONS, 
-    BULLET_SIZE,
     CANVAS_ID,
     CATEGORIES,
     COLLISION_FILTERS,
-    CPU_ANGLE_RANDOMNESS_FACTOR,
-    CPU_LENGTH,
     CPU_OPTIONS,
     CPU_VELOCITY_MIN,
     CPU_VELOCITY_MAX,
@@ -189,20 +173,10 @@ export default {
     EXPLOSION_PARTICLE_COUNT,
     GRAVITATIONAL_CONSTANT,
     LAST_SHOT_INDICATOR_OPTIONS,
-    LAST_SHOT_INDICATOR_SIZE,
     PARTICLE_OPTIONS,
-    PARTICLE_SIZE_MIN,
-    PARTICLE_SIZE_MAX,
-    PLANET_RADIUS_MIN,
     PLANET_OPTIONS,
     PLAYER_OPTIONS,
-    PLAYER_LENGTH,
     PLAYER_VELOCITY_FACTOR,
-    RENDER_MAX_HEIGHT,
-    RENDER_MAX_WIDTH,
-    TRAIL_BULLET_SIZE,
-    TRAIL_PARTICLE_SIZE,
     TRAIL_OPTIONS,
     WALL_OPTIONS,
-    WALL_THICKNESS,
 };
