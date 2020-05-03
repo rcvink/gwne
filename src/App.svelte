@@ -7,8 +7,10 @@
   import Categories from "./constants/Categories";
   import CollisionFilters from "./constants/CollisionFilters";
   import Dimensions from "./constants/Dimensions";
+  import ExplosionOptions from "./constants/ExplosionOptions";
   import GameFactory from "./factories/GameFactory";
   import GravityService from "./services/GravityService";
+  import EngineListeners from "./listeners/EngineListeners";
   import Physics from "./constants/Physics";
   import RandomService from "./services/RandomService";
   import Render from "./Render";
@@ -100,42 +102,80 @@
   };
 
   const registerPermanentListeners = () => {
-    trackMousePosition();
+    EngineListeners.trackMousePosition($engine, mouse, $mouse);
     trackCurrentPlayerVelocity();
     trackCurrentPlayerDegrees();
     playerFireOnClick();
     cpuFireOnCpuTurn();
-    winOrLoseOnHit();
-    bulletsExplodeOnCollisionWithCategory(Categories.CPU, {
-      animate: true,
-      destroyOtherBody: true,
-      updateTurn: false
-    });
-    bulletsExplodeOnCollisionWithCategory(Categories.PLAYER, {
-      animate: true,
-      destroyOtherBody: true,
-      updateTurn: false
-    });
-    bulletsExplodeOnCollisionWithCategory(Categories.PLANET, {
-      animate: true,
-      destroyOtherBody: false,
-      updateTurn: true
-    });
-    bulletsExplodeOnCollisionWithCategory(Categories.WALL, {
-      animate: false,
-      destroyOtherBody: false,
-      updateTurn: true
-    });
-    trailOnUpdate(
-      [Categories.BULLET.CPU, Categories.BULLET.PLAYER],
-      Dimensions.TRAIL_BULLET_SIZE
+    EngineListeners.winOrLoseOnHit(
+      $engine,
+      $cpu.id,
+      $player.id,
+      playerScore,
+      cpuScore,
+      startNewLevel
     );
-    trailOnUpdate([Categories.PARTICLE], Dimensions.TRAIL_PARTICLE_SIZE);
-    removeSleepingOnUpdate([Categories.PARTICLE, Categories.TRAIL]);
+    EngineListeners.bulletsExplodeOnCollisionWithCategory(
+      $engine,
+      Categories.CPU,
+      isShotInProgress,
+      isPlayerTurn,
+      bullet => populateWorld(BodyFactory.createParticles(bullet)),
+      removeFromWorld,
+      ExplosionOptions.PARTICIPANT
+    );
+    EngineListeners.bulletsExplodeOnCollisionWithCategory(
+      $engine,
+      Categories.PLAYER,
+      isShotInProgress,
+      isPlayerTurn,
+      bullet => populateWorld(BodyFactory.createParticles(bullet)),
+      removeFromWorld,
+      ExplosionOptions.PARTICIPANT
+    );
+    EngineListeners.bulletsExplodeOnCollisionWithCategory(
+      $engine,
+      Categories.PLANET,
+      isShotInProgress,
+      isPlayerTurn,
+      bullet => populateWorld(BodyFactory.createParticles(bullet)),
+      removeFromWorld,
+      ExplosionOptions.PLANET
+    );
+    EngineListeners.bulletsExplodeOnCollisionWithCategory(
+      $engine,
+      Categories.WALL,
+      isShotInProgress,
+      isPlayerTurn,
+      () => {},
+      removeFromWorld,
+      ExplosionOptions.WALL
+    );
+    EngineListeners.trailOnUpdate(
+      $engine,
+      getAllBodies,
+      [Categories.BULLET.CPU, Categories.BULLET.PLAYER],
+      bodyToTrail =>
+        populateWorld(
+          BodyFactory.createTrail(bodyToTrail, Dimensions.TRAIL_BULLET_SIZE)
+        )
+    );
+    EngineListeners.trailOnUpdate(
+      $engine,
+      getAllBodies,
+      [Categories.PARTICLE],
+      bodyToTrail =>
+        populateWorld(
+          BodyFactory.createTrail(bodyToTrail, Dimensions.TRAIL_PARTICLE_SIZE)
+        )
+    );
+    EngineListeners.removeSleepingOnUpdate(
+      $engine,
+      getAllBodies,
+      [Categories.PARTICLE, Categories.TRAIL],
+      removeFromWorld
+    );
   };
-
-  const trackMousePosition = () =>
-    Matter.Events.on($engine, "afterUpdate", () => mouse.set($mouse));
 
   const trackCurrentPlayerVelocity = () =>
     currentPlayerVelocity.subscribe(n => ($render.shotIndicatorVelocity = n));
@@ -181,67 +221,6 @@
       collisionFilter: CollisionFilters.BULLETS.CPU
     });
   };
-
-  const winOrLoseOnHit = () =>
-    Matter.Events.on($engine, "collisionStart", event => {
-      let pairs = event.pairs[0];
-      if (pairs.bodyA.id === $cpu.id || pairs.bodyB.id === $cpu.id) {
-        playerScore.update(n => n + 1);
-        startNewLevel();
-      } else if (pairs.bodyA.id === $player.id || pairs.bodyB.id === $cpu.id) {
-        cpuScore.update(n => n + 1);
-        startNewLevel();
-      }
-    });
-
-  const bulletsExplodeOnCollisionWithCategory = (category, options) =>
-    Matter.Events.on($engine, "collisionStart", event => {
-      let bullet, other;
-      let pairs = event.pairs[0];
-
-      if (pairs.bodyA.collisionFilter.category === category) {
-        bullet = pairs.bodyB;
-        other = pairs.bodyA;
-      } else if (pairs.bodyB.collisionFilter.category === category) {
-        bullet = pairs.bodyA;
-        other = pairs.bodyB;
-      } else {
-        return null;
-      }
-
-      isShotInProgress.set(false);
-      if (options.animate) {
-        populateWorld(BodyFactory.createParticles(bullet));
-      }
-      removeFromWorld(bullet);
-      if (options.destroyOtherBody) {
-        removeFromWorld(other);
-      }
-      if (options.updateTurn) {
-        isPlayerTurn.update(n => !n);
-      }
-    });
-
-  const trailOnUpdate = (categoriesToTrail, trailSize) =>
-    Matter.Events.on($engine, "afterUpdate", event =>
-      getAllBodies()
-        .filter(body =>
-          categoriesToTrail.includes(body.collisionFilter.category)
-        )
-        .forEach(bodyToTrail =>
-          populateWorld(BodyFactory.createTrail(bodyToTrail, trailSize))
-        )
-    );
-
-  const removeSleepingOnUpdate = categoriesToRemove =>
-    Matter.Events.on($engine, "afterUpdate", event =>
-      getAllBodies()
-        .filter(body => body.isSleeping)
-        .filter(sleepingBody =>
-          categoriesToRemove.includes(sleepingBody.collisionFilter.category)
-        )
-        .forEach(removeFromWorld)
-    );
 
   const populateWorld = objectsToAdd => Matter.World.add($world, objectsToAdd);
 
