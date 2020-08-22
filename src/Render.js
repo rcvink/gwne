@@ -1,7 +1,5 @@
 /**
-* The `Matter.Render` module is a simple HTML5 canvas based renderer for visualising instances of `Matter.Engine`.
-* It is intended for development and debugging purposes, but may also be suitable for simple games.
-* It includes a number of drawing options including wireframe, vector with support for sprites and viewports.
+* Ripped from `Matter.Render` module.
 *
 * @class Render
 */
@@ -11,6 +9,7 @@ var Render = {};
 export default Render;
 
 import Matter from "matter-js";
+import Categories from './constants/Categories';
 const Common = Matter.Common;
 const Composite = Matter.Composite;
 const Bounds = Matter.Bounds;
@@ -604,6 +603,21 @@ const Mouse = Matter.Mouse;
 
             if (!body.render.visible)
                 continue;
+
+            if (body.collisionFilter.category === Categories.BULLET.CPU || 
+                body.collisionFilter.category === Categories.BULLET.PLAYER) {
+                // c.moveTo(body.position.x, body.position.y);
+                // c.lineTo(
+                //     body.position.x - (body.velocity.x * 2), 
+                //     body.position.y - (body.velocity.y * 2));
+                c.beginPath();
+                c.arc(body.position.x, 
+                    body.position.y, 
+                    10,
+                    0,
+                    2 * Math.PI);
+                c.stroke();
+            }
 
             // handle compound parts
             for (k = body.parts.length > 1 ? 1 : 0; k < body.parts.length; k++) {

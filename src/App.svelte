@@ -126,11 +126,11 @@
       destroyOtherBody: false,
       updateTurn: true
     });
-    trailOnUpdate(
-      [Categories.BULLET.CPU, Categories.BULLET.PLAYER],
-      Dimensions.TRAIL_BULLET_SIZE
-    );
-    trailOnUpdate([Categories.PARTICLE], Dimensions.TRAIL_PARTICLE_SIZE);
+    // trailOnUpdate(
+    //   [Categories.BULLET.CPU, Categories.BULLET.PLAYER],
+    //   Dimensions.TRAIL_BULLET_SIZE
+    // );
+    // trailOnUpdate([Categories.PARTICLE], Dimensions.TRAIL_PARTICLE_SIZE);
     removeSleepingOnUpdate([Categories.PARTICLE, Categories.TRAIL]);
   };
 

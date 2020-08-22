@@ -1,13 +1,8 @@
 NOW IDEAS:
-- Hold to shoot
 - Move trails out of physics into rendering
 - Move last shot location out of physics into rendering
+- Hold to shoot
 - CPU improves shots, varying difficulties
-
-MAYBE:
-- velocity based on length of mousedown? 
-
-LATER IDEAS:
 - Variable planet densities
 - Multiple planets, not clashing
 - Worms-style tracking of bullets that are off-screen
